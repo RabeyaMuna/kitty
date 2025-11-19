@@ -16,6 +16,7 @@ except ImportError:
     is_macos = 'darwin' in sys.platform.lower()
 try:
     from kitty.utils import shlex_split as ksplit
+
     def shlex_split(text: str) -> Iterator[str]:
         yield from ksplit(text)
 except ImportError:
@@ -44,11 +45,10 @@ class CompletionRelativeTo(Enum):
 
 @dataclass
 class CompletionSpec:
-
     type: CompletionType = CompletionType.none
-    kwds: tuple[str,...] = ()
-    extensions: tuple[str,...] = ()
-    mime_patterns: tuple[str,...] = ()
+    kwds: tuple[str, ...] = ()
+    extensions: tuple[str, ...] = ()
+    mime_patterns: tuple[str, ...] = ()
     group: str = ''
     relative_to: CompletionRelativeTo = CompletionRelativeTo.cwd
 
@@ -80,7 +80,7 @@ class CompletionSpec:
         completers = []
         if self.kwds:
             kwds = (f'"{serialize_as_go_string(x)}"' for x in self.kwds)
-            g = (self.group if self.type is CompletionType.keyword else '') or "Keywords"
+            g = (self.group if self.type is CompletionType.keyword else '') or 'Keywords'
             completers.append(f'cli.NamesCompleter("{serialize_as_go_string(g)}", ' + ', '.join(kwds) + ')')
         relative_to = 'CONFIG' if self.relative_to is CompletionRelativeTo.config_dir else 'CWD'
         if self.type is CompletionType.file:
@@ -133,8 +133,15 @@ def parse_option_spec(spec: str | None = None) -> tuple[OptionSpecSeq, OptionSpe
     disabled: list[str | OptionDict] = []
     mpat = re.compile('([a-z]+)=(.+)')
     current_cmd: OptionDict = {
-        'dest': '', 'aliases': (), 'help': '', 'choices': (),
-        'type': '', 'condition': False, 'default': None, 'completion': CompletionSpec(), 'name': ''
+        'dest': '',
+        'aliases': (),
+        'help': '',
+        'choices': (),
+        'type': '',
+        'condition': False,
+        'default': None,
+        'completion': CompletionSpec(),
+        'name': '',
     }
     empty_cmd = current_cmd
 
@@ -153,9 +160,15 @@ def parse_option_spec(spec: str | None = None) -> tuple[OptionSpecSeq, OptionSpe
                 parts = line.split(' ')
                 defdest = parts[0][2:].replace('-', '_')
                 current_cmd = {
-                    'dest': defdest, 'aliases': tuple(parts), 'help': '',
-                    'choices': tuple(), 'type': '', 'name': defdest,
-                    'default': None, 'condition': True, 'completion': CompletionSpec(),
+                    'dest': defdest,
+                    'aliases': tuple(parts),
+                    'help': '',
+                    'choices': tuple(),
+                    'type': '',
+                    'name': defdest,
+                    'default': None,
+                    'condition': True,
+                    'completion': CompletionSpec(),
                 }
                 state = METADATA
                 continue
@@ -331,7 +344,7 @@ the :link:`inhibit-keyboard-shortcuts protocol <https://wayland.app/protocols/ke
 On macOS Apple doesn't allow applications to grab the keyboard without special permissions, so it doesn't work.
 """
 
-listen_on_defn = f'''\
+listen_on_defn = f"""\
 --listen-on
 completion=type:special group:complete_kitty_listen_on
 Listen on the specified socket address for control messages. For example,
@@ -347,9 +360,9 @@ you can send commands to it with :italic:`kitten @` using the
 environment. Note that this will be ignored unless :opt:`allow_remote_control`
 is set to either: :code:`yes`, :code:`socket` or :code:`socket-only`. This can
 also be specified in :file:`kitty.conf`.
-'''
+"""
 
-wait_for_single_instance_defn = f'''\
+wait_for_single_instance_defn = f"""\
 --wait-for-single-instance-window-close
 type=bool-set
 Normally, when using :option:`{appname} --single-instance`, :italic:`{appname}`
@@ -357,9 +370,9 @@ will open a new window in an existing instance and quit immediately. With this
 option, it will not quit till the newly opened window is closed. Note that if no
 previous instance is found, then :italic:`{appname}` will wait anyway,
 regardless of this option.
-'''
+"""
 
-CONFIG_HELP = '''\
+CONFIG_HELP = """\
 Specify a path to the configuration file(s) to use. All configuration files are
 merged onto the builtin :file:`{conf_name}.conf`, overriding the builtin values.
 This option can be specified multiple times to read multiple configuration files
@@ -379,15 +392,12 @@ If :file:`/etc/xdg/{appname}/{conf_name}.conf` exists, it is merged before (i.e.
 with lower priority) than any user config files. It can be used to specify
 system-wide defaults for all users. You can use either :code:`-` or
 :file:`/dev/stdin` to read the config from STDIN.
-'''.replace(
-    '{macos_confpath}',
-    (' :file:`~/Library/Preferences/{appname}/{conf_name}.conf`,' if is_macos else ''), 1
-)
+""".replace('{macos_confpath}', (' :file:`~/Library/Preferences/{appname}/{conf_name}.conf`,' if is_macos else ''), 1)
 
 
 def kitty_options_spec() -> str:
     if not hasattr(kitty_options_spec, 'ans'):
-        OPTIONS = '''
+        OPTIONS = """
 --class --app-id
 dest=cls
 default={appname}
@@ -552,31 +562,54 @@ This option is deprecated in favor of the :opt:`watcher` option in
 --execute -e
 type=bool-set
 !
-'''
-        setattr(kitty_options_spec, 'ans', OPTIONS.format(
-            appname=appname, conf_name=appname, listen_on_defn=listen_on_defn,
-            grab_keyboard_docs=grab_keyboard_docs, wait_for_single_instance_defn=wait_for_single_instance_defn,
-            config_help=CONFIG_HELP.format(appname=appname, conf_name=appname
-        )))
+"""
+        setattr(
+            kitty_options_spec,
+            'ans',
+            OPTIONS.format(
+                appname=appname,
+                conf_name=appname,
+                listen_on_defn=listen_on_defn,
+                grab_keyboard_docs=grab_keyboard_docs,
+                wait_for_single_instance_defn=wait_for_single_instance_defn,
+                config_help=CONFIG_HELP.format(appname=appname, conf_name=appname),
+            ),
+        )
     ans: str = getattr(kitty_options_spec, 'ans')
     return ans
+
+
 # }}}
 
 
 # panel CLI spec {{{
 panel_defaults = {
-    'lines': '1', 'columns': '1',
-    'margin_left': '0', 'margin_top': '0', 'margin_right': '0', 'margin_bottom': '0',
-    'edge': 'top', 'layer': 'bottom', 'override': '', 'cls': f'{appname}-panel',
-    'focus_policy': 'not-allowed', 'exclusive_zone': '-1', 'override_exclusive_zone': 'no',
-    'single_instance': 'no', 'instance_group': '', 'toggle_visibility': 'no',
-    'start_as_hidden': 'no', 'detach': 'no', 'detached_log': '',
+    'lines': '1',
+    'columns': '1',
+    'margin_left': '0',
+    'margin_top': '0',
+    'margin_right': '0',
+    'margin_bottom': '0',
+    'edge': 'top',
+    'layer': 'bottom',
+    'override': '',
+    'cls': f'{appname}-panel',
+    'focus_policy': 'not-allowed',
+    'exclusive_zone': '-1',
+    'override_exclusive_zone': 'no',
+    'single_instance': 'no',
+    'instance_group': '',
+    'toggle_visibility': 'no',
+    'start_as_hidden': 'no',
+    'detach': 'no',
+    'detached_log': '',
 }
+
 
 def build_panel_cli_spec(defaults: dict[str, str]) -> str:
     d = panel_defaults.copy()
     d.update(defaults)
-    return r'''
+    return r"""
 --lines
 default={lines}
 The number of lines shown in the panel. Ignored for background, centered, and vertical panels.
@@ -773,12 +806,13 @@ For internal debugging use.
 --debug-input
 type=bool-set
 For internal debugging use.
-'''.format(
-    appname=appname, listen_on_defn=listen_on_defn, grab_keyboard_docs=grab_keyboard_docs,
-    wait_for_single_instance_defn=wait_for_single_instance_defn, **d)
+""".format(
+        appname=appname, listen_on_defn=listen_on_defn, grab_keyboard_docs=grab_keyboard_docs, wait_for_single_instance_defn=wait_for_single_instance_defn, **d
+    )
 
 
 def panel_options_spec() -> str:
     return build_panel_cli_spec(panel_defaults)
+
 
 # }}}

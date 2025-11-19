@@ -11,8 +11,7 @@ from kitty.options.utils import pointer_shape_names
 
 definition = Definition(
     'kitty',
-    Action('map', 'parse_map', {'keyboard_modes': 'KeyboardModeMap', 'alias_map': 'AliasMap'},
-           ['KeyDefinition', 'kitty.fast_data_types.SingleKey']),
+    Action('map', 'parse_map', {'keyboard_modes': 'KeyboardModeMap', 'alias_map': 'AliasMap'}, ['KeyDefinition', 'kitty.fast_data_types.SingleKey']),
     Action('mouse_map', 'parse_mouse_map', {'mousemap': 'MouseMap'}, ['MouseMapping']),
     has_color_table=True,
 )
@@ -29,20 +28,27 @@ map = definition.add_map
 mma = definition.add_mouse_map
 
 # fonts {{{
-agr('fonts', 'Fonts', '''
+agr(
+    'fonts',
+    'Fonts',
+    """
 kitty has very powerful font management. You can configure individual font faces
 and even specify special fonts for particular characters.
-''')
+""",
+)
 
-opt('font_family', 'monospace', option_type='parse_font_spec',
-    long_text='''
+opt(
+    'font_family',
+    'monospace',
+    option_type='parse_font_spec',
+    long_text="""
 You can specify different fonts for the bold/italic/bold-italic variants.
 The easiest way to select fonts is to run the ``kitten choose-fonts`` command
 which will present a nice UI for you to select the fonts you want with previews
 and support for selecting variable fonts and font features. If you want to learn
 to select fonts manually, read the :ref:`font specification syntax <font_spec_syntax>`.
-'''
-    )
+""",
+)
 
 opt('bold_font', 'auto', option_type='parse_font_spec')
 
@@ -50,14 +56,14 @@ opt('italic_font', 'auto', option_type='parse_font_spec')
 
 opt('bold_italic_font', 'auto', option_type='parse_font_spec')
 
-opt('font_size', '11.0',
-    option_type='to_font_size', ctype='double',
-    long_text='Font size (in pts).'
-    )
+opt('font_size', '11.0', option_type='to_font_size', ctype='double', long_text='Font size (in pts).')
 
-opt('force_ltr', 'no',
-    option_type='to_bool', ctype='bool',
-    long_text='''
+opt(
+    'force_ltr',
+    'no',
+    option_type='to_bool',
+    ctype='bool',
+    long_text="""
 kitty does not support BIDI (bidirectional text), however, for RTL scripts,
 words are automatically displayed in RTL. That is to say, in an RTL script, the
 words "HELLO WORLD" display in kitty as "WORLD HELLO", and if you try to select
@@ -72,13 +78,15 @@ command line program :link:`GNU FriBidi
 <https://github.com/fribidi/fribidi#executable>` to get BIDI support, because it
 will force kitty to always treat the text as LTR, which FriBidi expects for
 terminals.
-'''
-    )
+""",
+)
 
-opt('+symbol_map', 'U+E0A0-U+E0A3,U+E0C0-U+E0C7 PowerlineSymbols',
+opt(
+    '+symbol_map',
+    'U+E0A0-U+E0A3,U+E0C0-U+E0C7 PowerlineSymbols',
     option_type='symbol_map',
     add_to_default=False,
-    long_text='''
+    long_text="""
 Map the specified Unicode codepoints to a particular font. Useful if you need
 special rendering for some symbols, such as for Powerline. Avoids the need for
 patched fonts. Each Unicode code point is specified in the form ``U+<code
@@ -87,13 +95,15 @@ commas and ranges separated by hyphens. This option can be specified multiple
 times. The syntax is::
 
     symbol_map codepoints Font Family Name
-'''
-    )
+""",
+)
 
-opt('+narrow_symbols', 'U+E0A0-U+E0A3,U+E0C0-U+E0C7 1',
+opt(
+    '+narrow_symbols',
+    'U+E0A0-U+E0A3,U+E0C0-U+E0C7 1',
     option_type='narrow_symbols',
     add_to_default=False,
-    long_text='''
+    long_text="""
 Usually, for Private Use Unicode characters and some symbol/dingbat characters,
 if the character is followed by one or more spaces, kitty will use those extra
 cells to render the character larger, if the character in the font has a wide
@@ -102,13 +112,16 @@ code points to render in the specified number of cells (defaulting to one cell).
 This option can be specified multiple times. The syntax is::
 
     narrow_symbols codepoints [optionally the number of cells]
-'''
-    )
+""",
+)
 
 
-opt('disable_ligatures', 'never',
-    option_type='disable_ligatures', ctype='int',
-    long_text='''
+opt(
+    'disable_ligatures',
+    'never',
+    option_type='disable_ligatures',
+    ctype='int',
+    long_text="""
 Choose how you want to handle multi-character ligatures. The default is to
 always render them. You can tell kitty to not render them when the cursor is
 over them by using :code:`cursor` to make editing easier, or have kitty never
@@ -123,11 +136,16 @@ or by defining shortcuts for it in :file:`kitty.conf`, for example::
 Note that this refers to programming ligatures, typically implemented using the
 :code:`calt` OpenType feature. For disabling general ligatures, use the
 :opt:`font_features` option.
-'''
-    )
+""",
+)
 
-opt('+font_features', 'none', option_type='font_features', ctype='!font_features',
-    add_to_default=False, long_text='''
+opt(
+    '+font_features',
+    'none',
+    option_type='font_features',
+    ctype='!font_features',
+    add_to_default=False,
+    long_text="""
 Choose exactly which OpenType features to enable or disable. Note that for the
 main fonts, features can be specified when selecting the font using the choose-fonts kitten.
 This setting is useful for fallback fonts.
@@ -170,13 +188,16 @@ entirely, and only look at their isolated forms if they show up in a document.
 You can do this with e.g.::
 
     font_features UnifontMedium +isol -medi -fina -init
-'''
-    )
+""",
+)
 
-opt('+modify_font', '',
-    option_type='modify_font', ctype='!modify_font',
+opt(
+    '+modify_font',
+    '',
+    option_type='modify_font',
+    ctype='!modify_font',
     add_to_default=False,
-    long_text='''
+    long_text="""
 Modify font characteristics such as the position or thickness of the underline
 and strikethrough. The modifications can have the suffix :code:`px` for pixels
 or :code:`%` for percentage of original value. No suffix means use pts.
@@ -198,31 +219,43 @@ Note that modifying the baseline will automatically adjust the underline and
 strikethrough positions by the same amount. Increasing the baseline raises
 glyphs inside the cell and decreasing it lowers them. Decreasing the cell size
 might cause rendering artifacts, so use with care.
-''')
+""",
+)
 
-opt('box_drawing_scale', '0.001, 1, 1.5, 2',
-    option_type='box_drawing_scale', ctype='!box_drawing_scale',
-    long_text='''
+opt(
+    'box_drawing_scale',
+    '0.001, 1, 1.5, 2',
+    option_type='box_drawing_scale',
+    ctype='!box_drawing_scale',
+    long_text="""
 The sizes of the lines used for the box drawing Unicode characters. These values
 are in pts. They will be scaled by the monitor DPI to arrive at a pixel value.
 There must be four values corresponding to thin, normal, thick, and very thick
 lines.
-'''
-    )
+""",
+)
 
-opt('undercurl_style', 'thin-sparse', ctype='undercurl_style',
+opt(
+    'undercurl_style',
+    'thin-sparse',
+    ctype='undercurl_style',
     choices=('thin-sparse', 'thin-dense', 'thick-sparse', 'thick-dense'),
-    long_text='''
+    long_text="""
 The style with which undercurls are rendered. This option takes the form
 :code:`(thin|thick)-(sparse|dense)`. Thin and thick control the thickness of the
 undercurl. Sparse and dense control how often the curl oscillates. With sparse
 the curl will peak once per character, with dense twice. Changing this
 option dynamically via reloading the config or remote control is undefined.
-'''
-    )
+""",
+)
 
 
-opt('underline_exclusion', '1', option_type='underline_exclusion', ctype='!underline_exclusion', long_text='''
+opt(
+    'underline_exclusion',
+    '1',
+    option_type='underline_exclusion',
+    ctype='!underline_exclusion',
+    long_text="""
 By default kitty renders gaps in underlines when they overlap with descenders
 (the parts of letters below the baseline, such as for y, q, p etc.). This option
 controls the thickness of the gaps. It can be either a unitless number in which
@@ -230,12 +263,15 @@ case it is a fraction of the underline thickness as specified in the font or
 it can have a suffix of :code:`px` for pixels or :code:`pt` for points. Set to zero
 to disable the gaps. Changing this option dynamically via reloading the config or remote
 control is undefined.
-''')
+""",
+)
 
 
-opt('text_composition_strategy', 'platform',
+opt(
+    'text_composition_strategy',
+    'platform',
     ctype='!text_composition_strategy',
-    long_text='''
+    long_text="""
 Control how kitty composites text glyphs onto the background color. The default
 value of :code:`platform` tries for text rendering as close to "native" for
 the platform kitty is running on as possible.
@@ -264,9 +300,14 @@ If you wish to achieve similar looking thickness in light and dark themes, a goo
 to experiment is start by setting the value to :code:`1.0 0` and use a dark theme.
 Then adjust the second parameter until it looks good. Then switch to a light theme
 and adjust the first parameter until the perceived thickness matches the dark theme.
-''')
+""",
+)
 
-opt('text_fg_override_threshold', '0', option_type='text_fg_override_threshold', long_text='''
+opt(
+    'text_fg_override_threshold',
+    '0',
+    option_type='text_fg_override_threshold',
+    long_text="""
 A setting to prevent low contrast between foreground and background colors.
 Useful when working with applications that use colors that do not contrast
 well with your preferred color scheme. The default value is :code:`0`, which means no color overriding is performed.
@@ -292,7 +333,8 @@ incorrect color, no color where you expect color, or any kind of graphic
 display problem try setting :opt:`text_fg_override_threshold` to :code:`0` to
 see if this is the cause of the problem or consider using the :code:`ratio` mode of operation
 described above instead of the :code:`%` mode of operation.
-''')
+""",
+)
 
 egr()  # }}}
 
@@ -300,9 +342,11 @@ egr()  # }}}
 # cursor {{{
 agr('cursor', 'Text cursor customization')
 
-opt('cursor', '#cccccc',
+opt(
+    'cursor',
+    '#cccccc',
     option_type='to_color_or_none',
-    long_text='''
+    long_text="""
 Default text cursor color. If set to the special value :code:`none` the cursor will
 be rendered with a "reverse video" effect. Its color will be the color of the
 text in the cell it is over and the text will be rendered with the background
@@ -311,23 +355,28 @@ cursor color, this takes precedence. Also, the cursor colors are modified if
 the cell background and foreground colors have very low contrast. Note that some
 themes set this value, so if you want to override it, place your value after
 the lines where the theme file is included.
-'''
-    )
+""",
+)
 
-opt('cursor_text_color', '#111111',
+opt(
+    'cursor_text_color',
+    '#111111',
     option_type='cursor_text_color',
-    long_text='''
+    long_text="""
 The color of text under the cursor. If you want it rendered with the
 background color of the cell underneath instead, use the special keyword:
 `background`. Note that if :opt:`cursor` is set to :code:`none` then this option
 is ignored. Note that some themes set this value, so if you want to override it,
 place your value after the lines where the theme file is included.
-'''
-    )
+""",
+)
 
-opt('cursor_shape', 'block',
-    option_type='to_cursor_shape', ctype='int',
-    long_text='''
+opt(
+    'cursor_shape',
+    'block',
+    option_type='to_cursor_shape',
+    ctype='int',
+    long_text="""
 The cursor shape can be one of :code:`block`, :code:`beam`, :code:`underline`.
 Note that when reloading the config this will be changed only if the cursor
 shape has not been set by the program running in the terminal. This sets the
@@ -335,26 +384,31 @@ default cursor shape, applications running in the terminal can override it. In
 particular, :ref:`shell integration <shell_integration>` in kitty sets the
 cursor shape to :code:`beam` at shell prompts. You can avoid this by setting
 :opt:`shell_integration` to :code:`no-cursor`.
-'''
-    )
+""",
+)
 
-opt('cursor_shape_unfocused', 'hollow', option_type='to_cursor_unfocused_shape', ctype='int', long_text='''
+opt(
+    'cursor_shape_unfocused',
+    'hollow',
+    option_type='to_cursor_unfocused_shape',
+    ctype='int',
+    long_text="""
 Defines the text cursor shape when the OS window is not focused. The unfocused
 cursor shape can be one of :code:`block`, :code:`beam`, :code:`underline`,
 :code:`hollow` and :code:`unchanged` (leave the cursor shape as it is).
-''')
+""",
+)
 
-opt('cursor_beam_thickness', '1.5',
-    option_type='positive_float', ctype='float',
-    long_text='The thickness of the beam cursor (in pts).'
-    )
+opt('cursor_beam_thickness', '1.5', option_type='positive_float', ctype='float', long_text='The thickness of the beam cursor (in pts).')
 
-opt('cursor_underline_thickness', '2.0',
-    option_type='positive_float', ctype='float',
-    long_text='The thickness of the underline cursor (in pts).'
-    )
+opt('cursor_underline_thickness', '2.0', option_type='positive_float', ctype='float', long_text='The thickness of the underline cursor (in pts).')
 
-opt('cursor_blink_interval', '-1', option_type='cursor_blink_interval', ctype='!cursor_blink_interval', long_text='''
+opt(
+    'cursor_blink_interval',
+    '-1',
+    option_type='cursor_blink_interval',
+    ctype='!cursor_blink_interval',
+    long_text="""
 The interval to blink the cursor (in seconds). Set to zero to disable blinking.
 Negative values mean use system default. Note that the minimum interval will be
 limited to :opt:`repaint_delay`. You can also animate the cursor blink by specifying
@@ -366,19 +420,27 @@ supports all the :link:`CSS easing functions <https://developer.mozilla.org/en-U
 Note that turning on animations uses extra power as it means the screen is redrawn multiple times
 per blink interval. See also, :opt:`cursor_stop_blinking_after`. This setting also controls blinking
 text, which blinks in exact rhythm with the cursor.
-''')
+""",
+)
 
-opt('cursor_stop_blinking_after', '15.0',
-    option_type='positive_float', ctype='time',
-    long_text='''
+opt(
+    'cursor_stop_blinking_after',
+    '15.0',
+    option_type='positive_float',
+    ctype='time',
+    long_text="""
 Stop blinking cursor after the specified number of seconds of keyboard
 inactivity. Set to zero to never stop blinking. This setting also controls
 blinking text, which blinks in exact rhythm with the cursor.
-''')
+""",
+)
 
-opt('cursor_trail', '0',
-    option_type='positive_int', ctype='time-ms',
-    long_text='''
+opt(
+    'cursor_trail',
+    '0',
+    option_type='positive_int',
+    ctype='time-ms',
+    long_text="""
 Set this to a value larger than zero to enable a "cursor trail" animation.
 This is an animation that shows a "trail" following the movement of the text cursor.
 It makes it easy to follow large cursor jumps and makes for a cool visual effect
@@ -389,12 +451,15 @@ than the specified number of milliseconds. This prevents trails from appearing
 for cursors that rapidly change their positions during UI updates in complex applications.
 See :opt:`cursor_trail_decay` to control the animation speed and :opt:`cursor_trail_start_threshold`
 to control when a cursor trail is started.
-''')
+""",
+)
 
-opt('cursor_trail_decay', '0.1 0.4',
+opt(
+    'cursor_trail_decay',
+    '0.1 0.4',
     option_type='cursor_trail_decay',
     ctype='!cursor_trail_decay',
-    long_text='''
+    long_text="""
 Controls the decay times for the cursor trail effect when the :opt:`cursor_trail`
 is enabled. This option accepts two positive float values specifying the
 fastest and slowest decay times in seconds. The first value corresponds to the
@@ -402,48 +467,62 @@ fastest decay time (minimum), and the second value corresponds to the slowest
 decay time (maximum). The second value must be equal to or greater than the
 first value. Smaller values result in a faster decay of the cursor trail.
 Adjust these values to control how quickly the cursor trail fades away.
-''')
+""",
+)
 
-opt('cursor_trail_start_threshold', '2',
-    option_type='positive_int', ctype='int',
-    long_text='''
+opt(
+    'cursor_trail_start_threshold',
+    '2',
+    option_type='positive_int',
+    ctype='int',
+    long_text="""
 Set the distance threshold for starting the cursor trail. This option accepts a
 positive integer value that represents the minimum number of cells the
 cursor must move before the trail is started. When the cursor moves less than
 this threshold, the trail is skipped, reducing unnecessary cursor trail
 animation.
-''')
+""",
+)
 
-opt('cursor_trail_color', 'none',
+opt(
+    'cursor_trail_color',
+    'none',
     option_type='to_color_or_none',
     ctype='!cursor_trail_color',
-    long_text='''
+    long_text="""
 Set the color of the cursor trail when :opt:`cursor_trail` is enabled.
 If set to 'none' (the default), the cursor trail will use the cursor's
 background color. Otherwise, specify a color value (e.g., #ff0000 for red,
 or a named color like 'red'). This allows you to customize the appearance
 of the cursor trail independently of the cursor color.
-''')
+""",
+)
 
 egr()  # }}}
 
 # scrollback {{{
 agr('scrollback', 'Scrollback')
 
-opt('scrollback_lines', '2000',
+opt(
+    'scrollback_lines',
+    '2000',
     option_type='scrollback_lines',
-    long_text='''
+    long_text="""
 Number of lines of history to keep in memory for scrolling back. Memory is
 allocated on demand. Negative numbers are (effectively) infinite scrollback.
 Note that using very large scrollback is not recommended as it can slow down
 performance of the terminal and also use large amounts of RAM. Instead, consider
 using :opt:`scrollback_pager_history_size`. Note that on config reload if this
 is changed it will only affect newly created windows, not existing ones.
-'''
-    )
+""",
+)
 
-opt('scrollbar', 'scrolled', ctype='scrollbar', choices=(
-    'scrolled', 'always', 'never', 'hovered', 'scrolled-and-hovered'), long_text='''\
+opt(
+    'scrollbar',
+    'scrolled',
+    ctype='scrollbar',
+    choices=('scrolled', 'always', 'never', 'hovered', 'scrolled-and-hovered'),
+    long_text="""\
 Control when the scrollbar is displayed.
 
 :code:`scrolled`
@@ -456,71 +535,152 @@ Control when the scrollbar is displayed.
     means whenever any scrollback is present
 :code:`never`
     means disable the scrollbar.
-''')
+""",
+)
 
-opt('scrollbar_interactive', 'yes', option_type='to_bool', ctype='bool', long_text='''
+opt(
+    'scrollbar_interactive',
+    'yes',
+    option_type='to_bool',
+    ctype='bool',
+    long_text="""
 If disabled, the scrollbar will not be controllable via th emouse and all mouse events
-will pass through the scrollbar.''')
+will pass through the scrollbar.""",
+)
 
-opt('scrollbar_jump_on_click', 'yes', option_type='to_bool', ctype='bool', long_text='''
+opt(
+    'scrollbar_jump_on_click',
+    'yes',
+    option_type='to_bool',
+    ctype='bool',
+    long_text="""
 When enabled clicking in the scrollbar track will cause the scroll position to
 jump to the clicked location, otherwise the scroll position will only move
-towards the position by a single screenful, which is how traditional scrollbars behave.''')
+towards the position by a single screenful, which is how traditional scrollbars behave.""",
+)
 
-opt('scrollbar_width', '0.5', option_type='positive_float', ctype='float', long_text='''
+opt(
+    'scrollbar_width',
+    '0.5',
+    option_type='positive_float',
+    ctype='float',
+    long_text="""
 The width of the scroll bar in units of cell width.
-''')
+""",
+)
 
-opt('scrollbar_hover_width', '1', option_type='positive_float', ctype='float', long_text='''
+opt(
+    'scrollbar_hover_width',
+    '1',
+    option_type='positive_float',
+    ctype='float',
+    long_text="""
 The width of the scroll bar when the mouse is hovering over it, in units of cell width.
-''')
+""",
+)
 
-opt('scrollbar_handle_opacity', '0.5', option_type='positive_float', ctype='float', long_text='''
+opt(
+    'scrollbar_handle_opacity',
+    '0.5',
+    option_type='positive_float',
+    ctype='float',
+    long_text="""
 The opacity of the scrollbar handle, 0 being fully transparent and 1 being full opaque.
-''')
+""",
+)
 
-opt('scrollbar_radius', '0.3', option_type='positive_float', ctype='float', long_text='''
+opt(
+    'scrollbar_radius',
+    '0.3',
+    option_type='positive_float',
+    ctype='float',
+    long_text="""
 The radius (curvature) of the scrollbar handle in units of cell width. Should be less than
 :opt:`scrollbar_width`.
-''')
+""",
+)
 
-opt('scrollbar_gap', '0.1', option_type='positive_float', ctype='float', long_text='''
+opt(
+    'scrollbar_gap',
+    '0.1',
+    option_type='positive_float',
+    ctype='float',
+    long_text="""
 The gap between the scrollbar and the window edge in units of cell width.
-''')
+""",
+)
 
-opt('scrollbar_min_handle_height', '1', option_type='positive_float', ctype='float', long_text='''
+opt(
+    'scrollbar_min_handle_height',
+    '1',
+    option_type='positive_float',
+    ctype='float',
+    long_text="""
 The minimum height of the scrollbar handle in units of cell height. Prevents the handle
-from becoming too small when there is a lot of scrollback.''')
+from becoming too small when there is a lot of scrollback.""",
+)
 
-opt('scrollbar_hitbox_expansion', '0.25', option_type='positive_float', ctype='float', long_text='''
-The extra area around the handle to allow easier grabbing of the scollbar in units of cell width.''')
+opt(
+    'scrollbar_hitbox_expansion',
+    '0.25',
+    option_type='positive_float',
+    ctype='float',
+    long_text="""
+The extra area around the handle to allow easier grabbing of the scollbar in units of cell width.""",
+)
 
-opt('scrollbar_track_opacity', '0', option_type='positive_float', ctype='float', long_text='''
+opt(
+    'scrollbar_track_opacity',
+    '0',
+    option_type='positive_float',
+    ctype='float',
+    long_text="""
 The opacity of the scrollbar track, 0 being fully transparent and 1 being full opaque.
-''')
+""",
+)
 
-opt('scrollbar_track_hover_opacity', '0.1', option_type='positive_float', ctype='float', long_text='''
+opt(
+    'scrollbar_track_hover_opacity',
+    '0.1',
+    option_type='positive_float',
+    ctype='float',
+    long_text="""
 The opacity of the scrollbar track when the mouse is over the scrollbar,
 0 being fully transparent and 1 being full opaque.
-''')
+""",
+)
 
-opt('scrollbar_handle_color', 'foreground', option_type='scrollbar_color', ctype='uint', long_text='''
+opt(
+    'scrollbar_handle_color',
+    'foreground',
+    option_type='scrollbar_color',
+    ctype='uint',
+    long_text="""
 The color of the scrollbar handle. A value of :code:`foreground` means to use
 the current foreground text color, a value of :code:`selection_background` means to
 use the current selection background color. Also, you can use an
 arbitrary color, such as :code:`#12af59` or :code:`red`.
-''')
+""",
+)
 
-opt('scrollbar_track_color', 'foreground', option_type='scrollbar_color', ctype='uint', long_text='''
+opt(
+    'scrollbar_track_color',
+    'foreground',
+    option_type='scrollbar_color',
+    ctype='uint',
+    long_text="""
 The color of the scrollbar track. A value of :code:`foreground` means to use
 the current foreground text color, a value of :code:`selection_background` means to
 use the current selection background color. Also, you can use an
 arbitrary color, such as :code:`#12af59` or :code:`red`.
-''')
+""",
+)
 
-opt('scrollback_pager', 'less --chop-long-lines --RAW-CONTROL-CHARS +INPUT_LINE_NUMBER',
+opt(
+    'scrollback_pager',
+    'less --chop-long-lines --RAW-CONTROL-CHARS +INPUT_LINE_NUMBER',
     option_type='to_cmdline',
-    long_text='''
+    long_text="""
 Program with which to view scrollback in a new window. The scrollback buffer is
 passed as STDIN to this program. If you change it, make sure the program you use
 can handle ANSI escape sequences for colors and text formatting.
@@ -529,12 +689,15 @@ representing which line should be at the top of the screen. Similarly
 CURSOR_LINE and CURSOR_COLUMN will be replaced by the current cursor position or
 set to 0 if there is no cursor, for example, when showing the last command
 output.
-'''
-    )
+""",
+)
 
-opt('scrollback_pager_history_size', '0',
-    option_type='scrollback_pager_history_size', ctype='uint',
-    long_text='''
+opt(
+    'scrollback_pager_history_size',
+    '0',
+    option_type='scrollback_pager_history_size',
+    ctype='uint',
+    long_text="""
 Separate scrollback history size (in MB), used only for browsing the scrollback
 buffer with pager. This separate buffer is not available for interactive
 scrolling but will be piped to the pager program when viewing scrollback buffer
@@ -543,53 +706,68 @@ approximately 10000 lines per megabyte at 100 chars per line, for pure ASCII,
 unformatted text. A value of zero or less disables this feature. The maximum
 allowed size is 4GB. Note that on config reload if this is changed it will only
 affect newly created windows, not existing ones.
-'''
-    )
+""",
+)
 
-opt('scrollback_fill_enlarged_window', 'no',
-    option_type='to_bool', ctype='bool',
-    long_text='Fill new space with lines from the scrollback buffer after enlarging a window.'
-    )
+opt(
+    'scrollback_fill_enlarged_window',
+    'no',
+    option_type='to_bool',
+    ctype='bool',
+    long_text='Fill new space with lines from the scrollback buffer after enlarging a window.',
+)
 
-opt('wheel_scroll_multiplier', '5.0',
-    option_type='float', ctype='double',
-    long_text='''
+opt(
+    'wheel_scroll_multiplier',
+    '5.0',
+    option_type='float',
+    ctype='double',
+    long_text="""
 Multiplier for the number of lines scrolled by the mouse wheel. Note that this
 is only used for low precision scrolling devices, not for high precision
 scrolling devices on platforms such as macOS and Wayland. Use negative numbers
 to change scroll direction. See also :opt:`wheel_scroll_min_lines`.
-'''
-    )
+""",
+)
 
-opt('wheel_scroll_min_lines', '1',
-    option_type='int', ctype='int',
-    long_text='''
+opt(
+    'wheel_scroll_min_lines',
+    '1',
+    option_type='int',
+    ctype='int',
+    long_text="""
 The minimum number of lines scrolled by the mouse wheel. The :opt:`scroll
 multiplier <wheel_scroll_multiplier>` only takes effect after it reaches this
 number. Note that this is only used for low precision scrolling devices like
 wheel mice that scroll by very small amounts when using the wheel. With a
 negative number, the minimum number of lines will always be added.
-'''
-    )
+""",
+)
 
-opt('touch_scroll_multiplier', '1.0',
-    option_type='float', ctype='double',
-    long_text='''
+opt(
+    'touch_scroll_multiplier',
+    '1.0',
+    option_type='float',
+    ctype='double',
+    long_text="""
 Multiplier for the number of lines scrolled by a touchpad. Note that this is
 only used for high precision scrolling devices on platforms such as macOS and
 Wayland. Use negative numbers to change scroll direction.
-'''
-    )
+""",
+)
 egr()  # }}}
 
 
 # mouse {{{
 agr('mouse', 'Mouse')
 
-opt('mouse_hide_wait', '3.0',
+opt(
+    'mouse_hide_wait',
+    '3.0',
     macos_default='0.0',
-    option_type='mouse_hide_wait', ctype='!mouse_hide_wait',
-    long_text='''
+    option_type='mouse_hide_wait',
+    ctype='!mouse_hide_wait',
+    long_text="""
 Hide mouse cursor after the specified number of seconds of the mouse not being
 used. Set to zero to disable mouse cursor hiding. Set to a negative value to
 hide the mouse cursor immediately when typing text. Disabled by default on macOS
@@ -632,52 +810,69 @@ Examples of valid values:
  - :code:`1.0`
  - :code:`-1.0`
  - :code:`0.1 3.0 40 yes`
-'''
-    )
+""",
+)
 
-opt('url_color', '#0087bd',
-    option_type='to_color', ctype='color_as_int',
-    long_text='''
+opt(
+    'url_color',
+    '#0087bd',
+    option_type='to_color',
+    ctype='color_as_int',
+    long_text="""
 The color and style for highlighting URLs on mouse-over. :opt:`url_style` can
 be one of: :code:`none`, :code:`straight`, :code:`double`, :code:`curly`,
 :code:`dotted`, :code:`dashed`.
-'''
-    )
+""",
+)
 
-opt('url_style', 'curly',
-    option_type='url_style', ctype='uint',
-    )
+opt(
+    'url_style',
+    'curly',
+    option_type='url_style',
+    ctype='uint',
+)
 
-opt('open_url_with', 'default',
+opt(
+    'open_url_with',
+    'default',
     option_type='to_cmdline',
-    long_text='''
+    long_text="""
 The program to open clicked URLs. The special value :code:`default` will first
 look for any URL handlers defined via the :doc:`open_actions` facility and if
 non are found, it will use the Operating System's default URL handler
 (:program:`open` on macOS and :program:`xdg-open` on Linux).
-'''
-    )
+""",
+)
 
-opt('url_prefixes', 'file ftp ftps gemini git gopher http https irc ircs kitty mailto news sftp ssh',
-    option_type='url_prefixes', ctype='!url_prefixes',
-    long_text='''
+opt(
+    'url_prefixes',
+    'file ftp ftps gemini git gopher http https irc ircs kitty mailto news sftp ssh',
+    option_type='url_prefixes',
+    ctype='!url_prefixes',
+    long_text="""
 The set of URL prefixes to look for when detecting a URL under the mouse cursor.
-'''
-    )
+""",
+)
 
-opt('detect_urls', 'yes',
-    option_type='to_bool', ctype='bool',
-    long_text='''
+opt(
+    'detect_urls',
+    'yes',
+    option_type='to_bool',
+    ctype='bool',
+    long_text="""
 Detect URLs under the mouse. Detected URLs are highlighted with an underline and
 the mouse cursor becomes a hand over them. Even if this option is disabled, URLs
 are still clickable. See also the :opt:`underline_hyperlinks` option to control
 how hyperlinks (as opposed to plain text URLs) are displayed.
-'''
-    )
+""",
+)
 
-opt('url_excluded_characters', '',
-    option_type='python_string', ctype='!url_excluded_characters',
-    long_text='''
+opt(
+    'url_excluded_characters',
+    '',
+    option_type='python_string',
+    ctype='!url_excluded_characters',
+    long_text="""
 Additional characters to be disallowed from URLs, when detecting URLs under the
 mouse cursor. By default, all characters that are legal in URLs are allowed.
 Additionally, newlines are allowed (but stripped). This is to accommodate
@@ -685,19 +880,27 @@ programs such as mutt that add hard line breaks even for continued lines.
 :code:`\\\\n` can be added to this option to disable this behavior. Special
 characters can be specified using backslash escapes, to specify a backslash use
 a double backslash.
-'''
-    )
+""",
+)
 
-opt('show_hyperlink_targets', 'no',
-    option_type='to_bool', ctype='bool',
-    long_text='''
+opt(
+    'show_hyperlink_targets',
+    'no',
+    option_type='to_bool',
+    ctype='bool',
+    long_text="""
 When the mouse hovers over a terminal hyperlink, show the actual URL that will
 be activated when the hyperlink is clicked.
-''')
+""",
+)
 
 
-opt('underline_hyperlinks', 'hover', choices=('hover', 'always', 'never'),
-    ctype='underline_hyperlinks', long_text='''
+opt(
+    'underline_hyperlinks',
+    'hover',
+    choices=('hover', 'always', 'never'),
+    ctype='underline_hyperlinks',
+    long_text="""
 Control how hyperlinks are underlined. They can either be underlined on mouse
 :code:`hover`, :code:`always` (i.e. permanently underlined) or :code:`never` which means
 that kitty will not apply any underline styling to hyperlinks. Note that the value of :code:`always`
@@ -705,12 +908,15 @@ only applies to real (OSC 8) hyperlinks not text that is detected to be a URL on
 Uses the :opt:`url_style` and :opt:`url_color` settings for the underline style. Note
 that reloading the config and changing this value to/from :code:`always` will only
 affect text subsequently received by kitty.
-''')
+""",
+)
 
 
-opt('copy_on_select', 'no',
+opt(
+    'copy_on_select',
+    'no',
     option_type='copy_on_select',
-    long_text='''
+    long_text="""
 Copy to clipboard or a private buffer on select. With this set to
 :code:`clipboard`, selecting text with the mouse will cause the text to be
 copied to clipboard. Useful on platforms such as macOS that do not have the
@@ -725,10 +931,14 @@ For example::
 Note that copying to the clipboard is a security risk, as all programs,
 including websites open in your browser can read the contents of the system
 clipboard.
-'''
-    )
+""",
+)
 
-opt('clear_selection_on_clipboard_loss', 'no', option_type='to_bool', long_text='''
+opt(
+    'clear_selection_on_clipboard_loss',
+    'no',
+    option_type='to_bool',
+    long_text="""
 When the contents of the clipboard no longer reflect the current selection, clear it.
 This is primarily useful on platforms such as Linux where selecting text automatically
 copies it to a special "primary selection" clipboard or if you have :opt:`copy_on_select`
@@ -737,11 +947,14 @@ set to :code:`clipboard`.
 Note that on macOS the system does not provide notifications when the clipboard owner
 is changed, so there, copying to clipboard in a non-kitty application will not clear
 selections even if :opt:`copy_on_select` is enabled.
-''')
+""",
+)
 
-opt('paste_actions', 'quote-urls-at-prompt,confirm',
+opt(
+    'paste_actions',
+    'quote-urls-at-prompt,confirm',
     option_type='paste_actions',
-    long_text='''
+    long_text="""
 A comma separated list of actions to take when pasting text into the terminal.
 The supported paste actions are:
 
@@ -765,81 +978,107 @@ The supported paste actions are:
     function will be actually pasted.
 :code:`no-op`:
     Has no effect.
-'''
-    )
+""",
+)
 
-opt('strip_trailing_spaces', 'never',
+opt(
+    'strip_trailing_spaces',
+    'never',
     choices=('always', 'never', 'smart'),
-    long_text='''
+    long_text="""
 Remove spaces at the end of lines when copying to clipboard. A value of
 :code:`smart` will do it when using normal selections, but not rectangle
 selections. A value of :code:`always` will always do it.
-'''
-    )
+""",
+)
 
-opt('select_by_word_characters', '@-./_~?&=%+#',
+opt(
+    'select_by_word_characters',
+    '@-./_~?&=%+#',
     ctype='!select_by_word_characters',
-    long_text='''
+    long_text="""
 Characters considered part of a word when double clicking. In addition to these
 characters any character that is marked as an alphanumeric character in the
 Unicode database will be matched.
-'''
-    )
+""",
+)
 
-opt('select_by_word_characters_forward', '',
+opt(
+    'select_by_word_characters_forward',
+    '',
     ctype='!select_by_word_characters_forward',
-    long_text='''
+    long_text="""
 Characters considered part of a word when extending the selection forward on
 double clicking. In addition to these characters any character that is marked
 as an alphanumeric character in the Unicode database will be matched.
 
 If empty (default) :opt:`select_by_word_characters` will be used for both
 directions.
-'''
-    )
+""",
+)
 
-opt('click_interval', '-1.0',
-    option_type='float', ctype='time',
-    long_text='''
+opt(
+    'click_interval',
+    '-1.0',
+    option_type='float',
+    ctype='time',
+    long_text="""
 The interval between successive clicks to detect double/triple clicks (in
 seconds). Negative numbers will use the system default instead, if available, or
 fallback to 0.5.
-'''
-    )
+""",
+)
 
-opt('focus_follows_mouse', 'no',
-    option_type='to_bool', ctype='bool',
-    long_text='''
+opt(
+    'focus_follows_mouse',
+    'no',
+    option_type='to_bool',
+    ctype='bool',
+    long_text="""
 Set the active window to the window under the mouse when moving the mouse around.
 On macOS, this will also cause the OS Window under the mouse to be focused automatically when the
 mouse enters it.
-'''
-    )
+""",
+)
 
-opt('pointer_shape_when_grabbed', 'arrow',
-    choices=pointer_shape_names, ctype='pointer_shape',
-    long_text='''
+opt(
+    'pointer_shape_when_grabbed',
+    'arrow',
+    choices=pointer_shape_names,
+    ctype='pointer_shape',
+    long_text="""
 The shape of the mouse pointer when the program running in the terminal grabs
 the mouse.
-'''
-    )
+""",
+)
 
-opt('default_pointer_shape', 'beam',
-    choices=pointer_shape_names, ctype='pointer_shape',
-    long_text='''
+opt(
+    'default_pointer_shape',
+    'beam',
+    choices=pointer_shape_names,
+    ctype='pointer_shape',
+    long_text="""
 The default shape of the mouse pointer.
-'''
-    )
+""",
+)
 
-opt('pointer_shape_when_dragging', 'beam crosshair', option_type='pointer_shape_when_dragging', ctype='!dragging_pointer_shape', long_text='''
+opt(
+    'pointer_shape_when_dragging',
+    'beam crosshair',
+    option_type='pointer_shape_when_dragging',
+    ctype='!dragging_pointer_shape',
+    long_text="""
 The default shape of the mouse pointer when dragging across text. The optional second value
 sets the shape when dragging in rectangular selection mode.
-'''
-    )
+""",
+)
 
 
 # mouse.mousemap {{{
-agr('mouse.mousemap', 'Mouse actions', '''
+agr(
+    'mouse.mousemap',
+    'Mouse actions',
+    """
 Mouse buttons can be mapped to perform arbitrary actions. The syntax is:
 
 .. code-block:: none
@@ -875,127 +1114,150 @@ See all the mappable actions including mouse actions :doc:`here </actions>`.
 .. note::
     Once a selection is started, releasing the button that started it will
     automatically end it and no release event will be dispatched.
-''')
+""",
+)
 
-opt('clear_all_mouse_actions', 'no',
+opt(
+    'clear_all_mouse_actions',
+    'no',
     option_type='clear_all_mouse_actions',
-    long_text='''
+    long_text="""
 Remove all mouse action definitions up to this point. Useful, for instance, to
 remove the default mouse actions.
-'''
-    )
+""",
+)
 
-mma('Click the link under the mouse or move the cursor',
+mma(
+    'Click the link under the mouse or move the cursor',
     'click_url_or_select left click ungrabbed mouse_handle_click selection link prompt',
-    long_text='''
+    long_text="""
 First check for a selection and if one exists do nothing. Then check for a link
 under the mouse cursor and if one exists, click it. Finally check if the click
 happened at the current shell prompt and if so, move the cursor to the click
 location. Note that this requires :ref:`shell integration <shell_integration>`
 to work.
-'''
-    )
+""",
+)
 
-mma('Click the link under the mouse or move the cursor even when grabbed',
+mma(
+    'Click the link under the mouse or move the cursor even when grabbed',
     'click_url_or_select_grabbed shift+left click grabbed,ungrabbed mouse_handle_click selection link prompt',
-    long_text='''
+    long_text="""
 Same as above, except that the action is performed even when the mouse is
 grabbed by the program running in the terminal.
-'''
-    )
+""",
+)
 
-mma('Click the link under the mouse cursor',
+mma(
+    'Click the link under the mouse cursor',
     'click_url ctrl+shift+left release grabbed,ungrabbed mouse_handle_click link',
-    long_text='''
+    long_text="""
 Variant with :kbd:`Ctrl+Shift` is present because the simple click based version
 has an unavoidable delay of :opt:`click_interval`, to disambiguate clicks from
 double clicks.
-'''
-    )
+""",
+)
 
-mma('Discard press event for link click',
+mma(
+    'Discard press event for link click',
     'click_url_discard ctrl+shift+left press grabbed discard_event',
-    long_text='''
+    long_text="""
 Prevent this press event from being sent to the program that has grabbed the
 mouse, as the corresponding release event is used to open a URL.
-'''
-    )
+""",
+)
 
 
-mma('Paste from the primary selection',
+mma(
+    'Paste from the primary selection',
     'paste_selection middle release ungrabbed paste_from_selection',
-    )
+)
 
-mma('Start selecting text',
+mma(
+    'Start selecting text',
     'start_simple_selection left press ungrabbed mouse_selection normal',
-    )
+)
 
-mma('Start selecting text in a rectangle',
+mma(
+    'Start selecting text in a rectangle',
     'start_rectangle_selection ctrl+alt+left press ungrabbed mouse_selection rectangle',
-    )
+)
 
-mma('Select a word',
+mma(
+    'Select a word',
     'select_word left doublepress ungrabbed mouse_selection word',
-    )
+)
 
-mma('Select a line',
+mma(
+    'Select a line',
     'select_line left triplepress ungrabbed mouse_selection line',
-    )
+)
 
-mma('Select line from point',
+mma(
+    'Select line from point',
     'select_line_from_point ctrl+alt+left triplepress ungrabbed mouse_selection line_from_point',
     long_text='Select from the clicked point to the end of the line.'
     ' If you would like to select the word at the point and then extend to the rest of the line,'
-    ' change `line_from_point` to `word_and_line_from_point`.'
-    )
+    ' change `line_from_point` to `word_and_line_from_point`.',
+)
 
-mma('Extend the current selection',
+mma(
+    'Extend the current selection',
     'extend_selection right press ungrabbed mouse_selection extend',
-    long_text='''
+    long_text="""
 If you want only the end of the selection to be moved instead of the nearest
 boundary, use :code:`move-end` instead of :code:`extend`.
-'''
-    )
+""",
+)
 
-mma('Paste from the primary selection even when grabbed',
+mma(
+    'Paste from the primary selection even when grabbed',
     'paste_selection_grabbed shift+middle release ungrabbed,grabbed paste_selection',
-    )
+)
 
-mma('Discard press event for middle click paste',
+mma(
+    'Discard press event for middle click paste',
     'paste_selection_grabbed shift+middle press grabbed discard_event',
-    )
+)
 
-mma('Start selecting text even when grabbed',
+mma(
+    'Start selecting text even when grabbed',
     'start_simple_selection_grabbed shift+left press ungrabbed,grabbed mouse_selection normal',
-    )
+)
 
-mma('Start selecting text in a rectangle even when grabbed',
+mma(
+    'Start selecting text in a rectangle even when grabbed',
     'start_rectangle_selection_grabbed ctrl+shift+alt+left press ungrabbed,grabbed mouse_selection rectangle',
-    )
+)
 
-mma('Select a word even when grabbed',
+mma(
+    'Select a word even when grabbed',
     'select_word_grabbed shift+left doublepress ungrabbed,grabbed mouse_selection word',
-    )
+)
 
-mma('Select a line even when grabbed',
+mma(
+    'Select a line even when grabbed',
     'select_line_grabbed shift+left triplepress ungrabbed,grabbed mouse_selection line',
-    )
+)
 
-mma('Select line from point even when grabbed',
+mma(
+    'Select line from point even when grabbed',
     'select_line_from_point_grabbed ctrl+shift+alt+left triplepress ungrabbed,grabbed mouse_selection line_from_point',
     long_text='Select from the clicked point to the end of the line even when grabbed.'
     ' If you would like to select the word at the point and then extend to the rest of the line,'
-    ' change `line_from_point` to `word_and_line_from_point`.'
-    )
+    ' change `line_from_point` to `word_and_line_from_point`.',
+)
 
-mma('Extend the current selection even when grabbed',
+mma(
+    'Extend the current selection even when grabbed',
     'extend_selection_grabbed shift+right press ungrabbed,grabbed mouse_selection extend',
-    )
+)
 
-mma('Show clicked command output in pager',
+mma(
+    'Show clicked command output in pager',
     'show_clicked_cmd_output_ungrabbed ctrl+shift+right press ungrabbed mouse_show_command_output',
-    long_text='Requires :ref:`shell integration <shell_integration>` to work.'
-    )
+    long_text='Requires :ref:`shell integration <shell_integration>` to work.',
+)
 egr()  # }}}
 egr()  # }}}
 
@@ -1003,55 +1265,70 @@ egr()  # }}}
 # performance {{{
 agr('performance', 'Performance tuning')
 
-opt('repaint_delay', '10',
-    option_type='positive_int', ctype='time-ms',
-    long_text='''
+opt(
+    'repaint_delay',
+    '10',
+    option_type='positive_int',
+    ctype='time-ms',
+    long_text="""
 Delay between screen updates (in milliseconds). Decreasing it, increases
 frames-per-second (FPS) at the cost of more CPU usage. The default value yields
 ~100 FPS which is more than sufficient for most uses. Note that to actually
 achieve 100 FPS, you have to either set :opt:`sync_to_monitor` to :code:`no` or
 use a monitor with a high refresh rate. Also, to minimize latency when there is
 pending input to be processed, this option is ignored.
-'''
-    )
+""",
+)
 
-opt('input_delay', '3',
-    option_type='positive_int', ctype='time-ms',
-    long_text='''
+opt(
+    'input_delay',
+    '3',
+    option_type='positive_int',
+    ctype='time-ms',
+    long_text="""
 Delay before input from the program running in the terminal is processed (in
 milliseconds). Note that decreasing it will increase responsiveness, but also
 increase CPU usage and might cause flicker in full screen programs that redraw
 the entire screen on each loop, because kitty is so fast that partial screen
 updates will be drawn. This setting is ignored when the input buffer is almost full.
-'''
-    )
+""",
+)
 
-opt('sync_to_monitor', 'yes',
-    option_type='to_bool', ctype='bool',
-    long_text='''
+opt(
+    'sync_to_monitor',
+    'yes',
+    option_type='to_bool',
+    ctype='bool',
+    long_text="""
 Sync screen updates to the refresh rate of the monitor. This prevents
 :link:`screen tearing <https://en.wikipedia.org/wiki/Screen_tearing>` when
 scrolling. However, it limits the rendering speed to the refresh rate of your
 monitor. With a very high speed mouse/high keyboard repeat rate, you may notice
 some slight input latency. If so, set this to :code:`no`.
-'''
-    )
+""",
+)
 egr()  # }}}
 
 
 # bell {{{
 agr('bell', 'Terminal bell')
 
-opt('enable_audio_bell', 'yes',
-    option_type='to_bool', ctype='bool',
-    long_text='''
+opt(
+    'enable_audio_bell',
+    'yes',
+    option_type='to_bool',
+    ctype='bool',
+    long_text="""
 The audio bell. Useful to disable it in environments that require silence.
-'''
-    )
+""",
+)
 
-opt('visual_bell_duration', '0.0',
-    option_type='visual_bell_duration', ctype='!visual_bell_duration',
-    long_text='''
+opt(
+    'visual_bell_duration',
+    '0.0',
+    option_type='visual_bell_duration',
+    ctype='!visual_bell_duration',
+    long_text="""
 The visual bell duration (in seconds). Flash the screen when a bell occurs for
 the specified number of seconds. Set to zero to disable. The flash is animated, fading
 in and out over the specified duration. The :term:`easing function` used for the fading can be controlled.
@@ -1060,29 +1337,36 @@ if unspecified is to use :code:`ease-in-out` which fades slowly at the start, mi
 You can specify different easing functions for the fade-in and fade-out parts, like this:
 :code:`2.0 ease-in linear`. kitty
 supports all the :link:`CSS easing functions <https://developer.mozilla.org/en-US/docs/Web/CSS/easing-function>`.
-'''
-    )
+""",
+)
 
-opt('visual_bell_color', 'none',
+opt(
+    'visual_bell_color',
+    'none',
     option_type='to_color_or_none',
-    long_text='''
+    long_text="""
 The color used by visual bell. Set to :code:`none` will fall back to selection
 background color. If you feel that the visual bell is too bright, you can
 set it to a darker color.
-'''
-    )
+""",
+)
 
-opt('window_alert_on_bell', 'yes',
-    option_type='to_bool', ctype='bool',
-    long_text='''
+opt(
+    'window_alert_on_bell',
+    'yes',
+    option_type='to_bool',
+    ctype='bool',
+    long_text="""
 Request window attention on bell. Makes the dock icon bounce on macOS or the
 taskbar flash on Linux.
-'''
-    )
+""",
+)
 
-opt('bell_on_tab', '"🔔 "',
+opt(
+    'bell_on_tab',
+    '"🔔 "',
     option_type='bell_on_tab',
-    long_text='''
+    long_text="""
 Some text or a Unicode symbol to show on the tab if a window in the tab that
 does not have focus has a bell. If you want to use leading or trailing
 spaces, surround the text with quotes. See :opt:`tab_title_template` for how
@@ -1091,31 +1375,39 @@ this is rendered.
 For backwards compatibility, values of :code:`yes`, :code:`y` and :code:`true`
 are converted to the default bell symbol and :code:`no`, :code:`n`,
 :code:`false` and :code:`none` are converted to the empty string.
-'''
-    )
+""",
+)
 
-opt('command_on_bell', 'none',
+opt(
+    'command_on_bell',
+    'none',
     option_type='to_cmdline',
-    long_text='''
+    long_text="""
 Program to run when a bell occurs. The environment variable
 :envvar:`KITTY_CHILD_CMDLINE` can be used to get the program running in the
 window in which the bell occurred.
-'''
-    )
+""",
+)
 
-opt('bell_path', 'none',
-    option_type='config_or_absolute_path', ctype='!bell_path',
-    long_text='''
+opt(
+    'bell_path',
+    'none',
+    option_type='config_or_absolute_path',
+    ctype='!bell_path',
+    long_text="""
 Path to a sound file to play as the bell sound. If set to :code:`none`, the
 system default bell sound is used. Must be in a format supported by the
 operating systems sound API, such as WAV or OGA on Linux (libcanberra) or AIFF,
 MP3 or WAV on macOS (NSSound). Relative paths are resolved
 with respect to the kitty config directory.
-'''
-    )
+""",
+)
 
-opt('linux_bell_theme', '__custom', ctype='!bell_theme',
-    long_text='''
+opt(
+    'linux_bell_theme',
+    '__custom',
+    ctype='!bell_theme',
+    long_text="""
 The XDG Sound Theme kitty will use to play the bell sound.
 On Wayland, when the compositor supports it, it is asked to play the system default
 bell sound, and this setting has no effect. Note that Hyprland claims to support this
@@ -1131,7 +1423,8 @@ To change your sound theme desktop wide, create :file:`~/.local/share/sounds/__c
 
 Replace :code:`name-of-the-sound-theme-you-want-to-use` with the actual theme name. Now all compliant applications
 should use sounds from this theme.
-''')
+""",
+)
 
 egr()  # }}}
 
@@ -1139,127 +1432,155 @@ egr()  # }}}
 # window {{{
 agr('window', 'Window layout')
 
-opt('remember_window_size', 'yes',
+opt(
+    'remember_window_size',
+    'yes',
     option_type='to_bool',
-    long_text='''
+    long_text="""
 If enabled, the :term:`OS Window <os_window>` size will be remembered so that
 new instances of kitty will have the same size as the previous instance.
 If disabled, the :term:`OS Window <os_window>` will initially have size
 configured by initial_window_width/height, in pixels. You can use a suffix of
 "c" on the width/height values to have them interpreted as number of cells
 instead of pixels.
-'''
-    )
+""",
+)
 
-opt('initial_window_width', '640',
+opt(
+    'initial_window_width',
+    '640',
     option_type='window_size',
-    )
+)
 
-opt('initial_window_height', '400',
+opt(
+    'initial_window_height',
+    '400',
     option_type='window_size',
-    )
+)
 
-opt('remember_window_position', 'no',
+opt(
+    'remember_window_position',
+    'no',
     option_type='to_bool',
-    long_text='''
+    long_text="""
 If enabled, the :term:`OS Window <os_window>` position will be remembered so that
 new instances of kitty will have the same position as the previous instance.
 If disabled, the :term:`OS Window <os_window>` will be placed by the window manager.
 Note that remembering of position only works if the underlying desktop environment/window
 manager supports it. It never works on Wayland. See also :option:`kitty --position` to
 specify the position when launching kitty.
-'''
-    )
+""",
+)
 
-opt('enabled_layouts', '*',
+opt(
+    'enabled_layouts',
+    '*',
     option_type='to_layout_names',
-    long_text='''
+    long_text="""
 The enabled window layouts. A comma separated list of layout names. The special
 value :code:`all` means all layouts. The first listed layout will be used as the
 startup layout. Default configuration is all layouts in alphabetical order. For
 a list of available layouts, see the :ref:`layouts`.
-'''
-    )
+""",
+)
 
-opt('window_resize_step_cells', '2',
+opt(
+    'window_resize_step_cells',
+    '2',
     option_type='positive_int',
-    long_text='''
+    long_text="""
 The step size (in units of cell width/cell height) to use when resizing kitty
 windows in a layout with the shortcut :sc:`start_resizing_window`. The cells
 value is used for horizontal resizing, and the lines value is used for vertical
 resizing.
-'''
-    )
+""",
+)
 
-opt('window_resize_step_lines', '2',
+opt(
+    'window_resize_step_lines',
+    '2',
     option_type='positive_int',
-    )
+)
 
-opt('window_border_width', '0.5pt',
+opt(
+    'window_border_width',
+    '0.5pt',
     option_type='window_border_width',
-    long_text='''
+    long_text="""
 The width of window borders. Can be either in pixels (px) or pts (pt). Values in
 pts will be rounded to the nearest number of pixels based on screen resolution.
 If not specified, the unit is assumed to be pts. Note that borders are displayed
 only when more than one window is visible. They are meant to separate multiple
 windows.
-'''
-    )
+""",
+)
 
-opt('draw_minimal_borders', 'yes',
+opt(
+    'draw_minimal_borders',
+    'yes',
     option_type='to_bool',
-    long_text='''
+    long_text="""
 Draw only the minimum borders needed. This means that only the borders that
 separate the window from a neighbor are drawn. Note that setting a
 non-zero :opt:`window_margin_width` overrides this and causes all borders to be
 drawn.
-'''
-    )
+""",
+)
 
-opt('window_margin_width', '0',
+opt(
+    'window_margin_width',
+    '0',
     option_type='edge_width',
-    long_text='''
+    long_text="""
 The window margin (in pts) (blank area outside the border). A single value sets
 all four sides. Two values set the vertical and horizontal sides. Three values
 set top, horizontal and bottom. Four values set top, right, bottom and left.
-'''
-    )
+""",
+)
 
-opt('single_window_margin_width', '-1',
+opt(
+    'single_window_margin_width',
+    '-1',
     option_type='optional_edge_width',
-    long_text='''
+    long_text="""
 The window margin to use when only a single window is visible (in pts). Negative
 values will cause the value of :opt:`window_margin_width` to be used instead. A
 single value sets all four sides. Two values set the vertical and horizontal
 sides. Three values set top, horizontal and bottom. Four values set top, right,
 bottom and left.
-'''
-    )
+""",
+)
 
-opt('window_padding_width', '0',
+opt(
+    'window_padding_width',
+    '0',
     option_type='edge_width',
-    long_text='''
+    long_text="""
 The window padding (in pts) (blank area between the text and the window border).
 A single value sets all four sides. Two values set the vertical and horizontal
 sides. Three values set top, horizontal and bottom. Four values set top, right,
 bottom and left.
-'''
-    )
+""",
+)
 
-opt('single_window_padding_width', '-1',
+opt(
+    'single_window_padding_width',
+    '-1',
     option_type='optional_edge_width',
-    long_text='''
+    long_text="""
 The window padding to use when only a single window is visible (in pts). Negative
 values will cause the value of :opt:`window_padding_width` to be used instead. A
 single value sets all four sides. Two values set the vertical and horizontal
 sides. Three values set top, horizontal and bottom. Four values set top, right,
 bottom and left.
-'''
-    )
+""",
+)
 
-opt('placement_strategy', 'center',
+opt(
+    'placement_strategy',
+    'center',
     choices=('top-left', 'top', 'top-right', 'left', 'center', 'right', 'bottom-left', 'bottom', 'bottom-right'),
-    long_text='''
+    long_text="""
 When the window size is not an exact multiple of the cell size, the cell area of
 the terminal window will have some extra padding on the sides. You can control
 how that padding is distributed with this option. Using a value of
@@ -1268,38 +1589,47 @@ how that padding is distributed with this option. Using a value of
 The value can be one of: :code:`top-left`, :code:`top`, :code:`top-right`,
 :code:`left`, :code:`center`, :code:`right`, :code:`bottom-left`,
 :code:`bottom`, :code:`bottom-right`.
-'''
-    )
+""",
+)
 
-opt('active_border_color', '#00ff00',
-    option_type='to_color_or_none', ctype='active_border_color',
-    long_text='''
+opt(
+    'active_border_color',
+    '#00ff00',
+    option_type='to_color_or_none',
+    ctype='active_border_color',
+    long_text="""
 The color for the border of the active window. Set this to :code:`none` to not
 draw borders around the active window.
-'''
-    )
+""",
+)
 
-opt('inactive_border_color', '#cccccc',
-    option_type='to_color', ctype='color_as_int',
-    long_text='The color for the border of inactive windows.'
-    )
+opt('inactive_border_color', '#cccccc', option_type='to_color', ctype='color_as_int', long_text='The color for the border of inactive windows.')
 
-opt('bell_border_color', '#ff5a00',
-    option_type='to_color', ctype='color_as_int',
-    long_text='The color for the border of inactive windows in which a bell has occurred.'
-    )
+opt(
+    'bell_border_color',
+    '#ff5a00',
+    option_type='to_color',
+    ctype='color_as_int',
+    long_text='The color for the border of inactive windows in which a bell has occurred.',
+)
 
-opt('inactive_text_alpha', '1.0',
-    option_type='unit_float', ctype='float',
-    long_text='''
+opt(
+    'inactive_text_alpha',
+    '1.0',
+    option_type='unit_float',
+    ctype='float',
+    long_text="""
 Fade the text in inactive windows by the specified amount (a number between zero
 and one, with zero being fully faded).
-'''
-    )
+""",
+)
 
-opt('hide_window_decorations', 'no',
-    option_type='hide_window_decorations', ctype='uint',
-    long_text='''
+opt(
+    'hide_window_decorations',
+    'no',
+    option_type='hide_window_decorations',
+    ctype='uint',
+    long_text="""
 Hide the window decorations (title-bar and window borders) with :code:`yes`. On
 macOS, :code:`titlebar-only` and :code:`titlebar-and-corners` can be used to only hide the titlebar and the rounded corners.
 Whether this works and exactly what effect it has depends on the window manager/operating
@@ -1307,39 +1637,52 @@ system. Note that the effects of changing this option when reloading config
 are undefined. When using :code:`titlebar-only`, it is useful to also set
 :opt:`window_margin_width` and :opt:`placement_strategy` to prevent the rounded
 corners from clipping text. Or use :code:`titlebar-and-corners`.
-'''
-    )
+""",
+)
 
-opt('window_logo_path', 'none',
-    option_type='config_or_absolute_path', ctype='!window_logo_path',
-    long_text='''
+opt(
+    'window_logo_path',
+    'none',
+    option_type='config_or_absolute_path',
+    ctype='!window_logo_path',
+    long_text="""
 Path to a logo image. Must be in PNG/JPEG/WEBP/GIF/TIFF/BMP format. Relative paths are interpreted
 relative to the kitty config directory. The logo is displayed in a corner of
 every kitty window. The position is controlled by :opt:`window_logo_position`.
 Individual windows can be configured to have different logos either using the
 :ac:`launch` action or the :doc:`remote control <remote-control>` facility.
-'''
-    )
+""",
+)
 
-opt('window_logo_position', 'bottom-right',
+opt(
+    'window_logo_position',
+    'bottom-right',
     choices=('top-left', 'top', 'top-right', 'left', 'center', 'right', 'bottom-left', 'bottom', 'bottom-right'),
     ctype='bganchor',
-    long_text='''
+    long_text="""
 Where to position the window logo in the window. The value can be one of:
 :code:`top-left`, :code:`top`, :code:`top-right`, :code:`left`, :code:`center`,
 :code:`right`, :code:`bottom-left`, :code:`bottom`, :code:`bottom-right`.
-'''
-    )
+""",
+)
 
-opt('window_logo_alpha', '0.5',
-    option_type='unit_float', ctype='float',
-    long_text='''
+opt(
+    'window_logo_alpha',
+    '0.5',
+    option_type='unit_float',
+    ctype='float',
+    long_text="""
 The amount the logo should be faded into the background. With zero being fully
 faded and one being fully opaque.
-'''
-    )
+""",
+)
 
-opt('window_logo_scale', '0', option_type='window_logo_scale', ctype='!window_logo_scale', long_text='''
+opt(
+    'window_logo_scale',
+    '0',
+    option_type='window_logo_scale',
+    ctype='!window_logo_scale',
+    long_text="""
 The percentage (0-100] of the window size to which the logo should scale. Using a single
 number means the logo is scaled to that percentage of the shortest window dimension, while preserving
 aspect ratio of the logo image.
@@ -1349,11 +1692,15 @@ percentage of the window's width and height.
 
 Using zero as the percentage disables scaling in that dimension. A single zero (the default)
 disables all scaling of the window logo.
-''')
+""",
+)
 
-opt('resize_debounce_time', '0.1 0.5',
-    option_type='resize_debounce_time', ctype='!resize_debounce_time',
-    long_text='''
+opt(
+    'resize_debounce_time',
+    '0.1 0.5',
+    option_type='resize_debounce_time',
+    ctype='!resize_debounce_time',
+    long_text="""
 The time to wait (in seconds) before asking the program running in kitty to resize and
 redraw the screen during a live resize of the OS window, when no new resize
 events have been received, i.e. when resizing is either paused or finished.
@@ -1364,31 +1711,40 @@ resizing. On such systems the first number is ignored and redraw is immediate
 after end of resize. On other systems only the first number is used so that kitty
 is "ready" quickly after the end of resizing, while not also continuously
 redrawing, to save energy.
-'''
-    )
+""",
+)
 
-opt('resize_in_steps', 'no',
-    option_type='to_bool', ctype='bool',
-    long_text='''
+opt(
+    'resize_in_steps',
+    'no',
+    option_type='to_bool',
+    ctype='bool',
+    long_text="""
 Resize the OS window in steps as large as the cells, instead of with the usual
 pixel accuracy. Combined with :opt:`initial_window_width` and
 :opt:`initial_window_height` in number of cells, this option can be used to keep
 the margins as small as possible when resizing the OS window. Note that this
 does not currently work on Wayland.
-'''
-    )
+""",
+)
 
-opt('visual_window_select_characters', defval=string.digits[1:] + '0' + string.ascii_uppercase,
+opt(
+    'visual_window_select_characters',
+    defval=string.digits[1:] + '0' + string.ascii_uppercase,
     option_type='visual_window_select_characters',
-    long_text=r'''
+    long_text=r"""
 The list of characters for visual window selection. For example, for selecting a
 window to focus on with :sc:`focus_visible_window`. The value should be a series
 of unique numbers or alphabets, case insensitive, from the set :code:`0-9A-Z\`-=[];',./\\`.
 Specify your preference as a string of characters.
-'''
-    )
+""",
+)
 
-opt('confirm_os_window_close', '-1', option_type='confirm_close', long_text='''
+opt(
+    'confirm_os_window_close',
+    '-1',
+    option_type='confirm_close',
+    long_text="""
 Ask for confirmation when closing an OS window or a tab with at least this
 number of kitty windows in it by window manager (e.g. clicking the window close
 button or pressing the operating system shortcut to close windows) or by the
@@ -1401,36 +1757,36 @@ currently running. You can also have backgrounded jobs prevent closing,
 by adding :code:`count-background` to the setting, for example: :code:`-1 count-background`.
 Note that if you want confirmation when closing individual windows,
 you can map the :ac:`close_window_with_confirmation` action.
-''')
+""",
+)
 egr()  # }}}
 
 
 # tabbar {{{
 agr('tabbar', 'Tab bar')
 
-opt('tab_bar_edge', 'bottom',
-    option_type='tab_bar_edge', ctype='int',
-    long_text='The edge to show the tab bar on, :code:`top` or :code:`bottom`.'
-    )
+opt('tab_bar_edge', 'bottom', option_type='tab_bar_edge', ctype='int', long_text='The edge to show the tab bar on, :code:`top` or :code:`bottom`.')
 
-opt('tab_bar_margin_width', '0.0',
-    option_type='positive_float',
-    long_text='The margin to the left and right of the tab bar (in pts).'
-    )
+opt('tab_bar_margin_width', '0.0', option_type='positive_float', long_text='The margin to the left and right of the tab bar (in pts).')
 
-opt('tab_bar_margin_height', '0.0 0.0',
-    option_type='tab_bar_margin_height', ctype='!tab_bar_margin_height',
-    long_text='''
+opt(
+    'tab_bar_margin_height',
+    '0.0 0.0',
+    option_type='tab_bar_margin_height',
+    ctype='!tab_bar_margin_height',
+    long_text="""
 The margin above and below the tab bar (in pts). The first number is the margin
 between the edge of the OS Window and the tab bar. The second number is the
 margin between the tab bar and the contents of the current tab.
-'''
-    )
+""",
+)
 
-opt('tab_bar_style', 'fade',
+opt(
+    'tab_bar_style',
+    'fade',
     choices=('fade', 'hidden', 'powerline', 'separator', 'slant', 'custom'),
     ctype='!tab_bar_style',
-    long_text='''
+    long_text="""
 The tab bar style, can be one of:
 
 :code:`fade`
@@ -1454,10 +1810,13 @@ The tab bar style, can be one of:
     The tab bar is hidden. If you use this, you might want to create
     a mapping for the :ac:`select_tab` action which presents you with a list of
     tabs and allows for easy switching to a tab.
-'''
-    )
+""",
+)
 
-opt('tab_bar_filter', '', long_text='''
+opt(
+    'tab_bar_filter',
+    '',
+    long_text="""
 A :ref:`search expression <search_syntax>`. Only tabs that match this expression
 will be shown in the tab bar. The currently active tab is :italic:`always` shown,
 regardless of whether it matches or not. When using this option, the tab bar may
@@ -1467,81 +1826,95 @@ using :ref:`sessions <sessions>`. An expression of :code:`session:~ or session:^
 will show only tabs that belong to the current session or no session. The various
 tab navigation actions such as :ac:`goto_tab`, :ac:`next_tab`, :ac:`previous_tab`, etc.
 are automatically restricted to work only on matching tabs.
-''')
+""",
+)
 
-opt('tab_bar_align', 'left',
+opt(
+    'tab_bar_align',
+    'left',
     choices=('left', 'center', 'right'),
-    long_text='''
+    long_text="""
 The horizontal alignment of the tab bar, can be one of: :code:`left`,
 :code:`center`, :code:`right`.
-'''
-    )
+""",
+)
 
-opt('tab_bar_min_tabs', '2',
-    option_type='tab_bar_min_tabs', ctype='uint',
-    long_text='The minimum number of tabs that must exist before the tab bar is shown.'
-    )
+opt('tab_bar_min_tabs', '2', option_type='tab_bar_min_tabs', ctype='uint', long_text='The minimum number of tabs that must exist before the tab bar is shown.')
 
-opt('tab_switch_strategy', 'previous',
+opt(
+    'tab_switch_strategy',
+    'previous',
     choices=('last', 'left', 'previous', 'right'),
-    long_text='''
+    long_text="""
 The algorithm to use when switching to a tab when the current tab is closed. The
 default of :code:`previous` will switch to the last used tab. A value of
 :code:`left` will switch to the tab to the left of the closed tab. A value of
 :code:`right` will switch to the tab to the right of the closed tab. A value of
 :code:`last` will switch to the right-most tab.
-'''
-    )
+""",
+)
 
-opt('tab_fade', '0.25 0.5 0.75 1',
+opt(
+    'tab_fade',
+    '0.25 0.5 0.75 1',
     option_type='tab_fade',
-    long_text='''
+    long_text="""
 Control how each tab fades into the background when using :code:`fade` for the
 :opt:`tab_bar_style`. Each number is an alpha (between zero and one) that
 controls how much the corresponding cell fades into the background, with zero
 being no fade and one being full fade. You can change the number of cells used
 by adding/removing entries to this list.
-'''
-    )
+""",
+)
 
-opt('tab_separator', '" ┇"',
+opt(
+    'tab_separator',
+    '" ┇"',
     option_type='tab_separator',
-    long_text='''
+    long_text="""
 The separator between tabs in the tab bar when using :code:`separator` as the
 :opt:`tab_bar_style`.
-'''
-    )
+""",
+)
 
-opt('tab_powerline_style', 'angled',
+opt(
+    'tab_powerline_style',
+    'angled',
     choices=('angled', 'round', 'slanted'),
-    long_text='''
+    long_text="""
 The powerline separator style between tabs in the tab bar when using
 :code:`powerline` as the :opt:`tab_bar_style`, can be one of: :code:`angled`,
 :code:`slanted`, :code:`round`.
-'''
-    )
+""",
+)
 
-opt('tab_activity_symbol', 'none',
+opt(
+    'tab_activity_symbol',
+    'none',
     option_type='tab_activity_symbol',
-    long_text='''
+    long_text="""
 Some text or a Unicode symbol to show on the tab if a window in the tab that
 does not have focus has some activity. If you want to use leading or trailing
 spaces, surround the text with quotes. See :opt:`tab_title_template` for how
 this is rendered.
-'''
-    )
+""",
+)
 
-opt('tab_title_max_length', '0',
+opt(
+    'tab_title_max_length',
+    '0',
     option_type='positive_int',
-    long_text='''
+    long_text="""
 The maximum number of cells that can be used to render the text in a tab.
 A value of zero means that no limit is applied.
-'''
-    )
+""",
+)
 
-opt('tab_title_template', '"{fmt.fg.red}{bell_symbol}{activity_symbol}{fmt.fg.tab}{tab.last_focused_progress_percent}{title}"',
+opt(
+    'tab_title_template',
+    '"{fmt.fg.red}{bell_symbol}{activity_symbol}{fmt.fg.tab}{tab.last_focused_progress_percent}{title}"',
     option_type='tab_title_template',
-    long_text='''
+    long_text="""
 A template to render the tab title. The default just renders the title with
 optional symbols for bell and activity. If you wish to include the tab-index as
 well, use something like: :code:`{index}:{title}`. Useful if you have shortcuts
@@ -1600,72 +1973,87 @@ The 256 eight terminal colors can be used as ``fmt.fg.color0`` through ``fmt.fg.
 Note that for backward compatibility, if :code:`{bell_symbol}` or
 :code:`{activity_symbol}` are not present in the template, they are prepended to
 it.
-'''
-    )
+""",
+)
 
-opt('active_tab_title_template', 'none',
+opt(
+    'active_tab_title_template',
+    'none',
     option_type='active_tab_title_template',
-    long_text='''
+    long_text="""
 Template to use for active tabs. If not specified falls back to
 :opt:`tab_title_template`.
-'''
-    )
+""",
+)
 
-opt('active_tab_foreground', '#000',
+opt('active_tab_foreground', '#000', option_type='to_color', long_text='Tab bar colors and styles.')
+
+opt(
+    'active_tab_background',
+    '#eee',
     option_type='to_color',
-    long_text='Tab bar colors and styles.'
-    )
+)
 
-opt('active_tab_background', '#eee',
-    option_type='to_color',
-    )
-
-opt('active_tab_font_style', 'bold-italic',
+opt(
+    'active_tab_font_style',
+    'bold-italic',
     option_type='tab_font_style',
-    )
+)
 
-opt('inactive_tab_foreground', '#444',
+opt(
+    'inactive_tab_foreground',
+    '#444',
     option_type='to_color',
-    )
+)
 
-opt('inactive_tab_background', '#999',
+opt(
+    'inactive_tab_background',
+    '#999',
     option_type='to_color',
-    )
+)
 
-opt('inactive_tab_font_style', 'normal',
+opt(
+    'inactive_tab_font_style',
+    'normal',
     option_type='tab_font_style',
-    )
+)
 
-opt('tab_bar_background', 'none',
-    option_type='to_color_or_none', ctype='color_or_none_as_int',
-    long_text='''
+opt(
+    'tab_bar_background',
+    'none',
+    option_type='to_color_or_none',
+    ctype='color_or_none_as_int',
+    long_text="""
 Background color for the tab bar. Defaults to using the terminal background
 color.
-'''
-    )
+""",
+)
 
-opt('tab_bar_margin_color', 'none',
-    option_type='to_color_or_none', ctype='color_or_none_as_int',
-    long_text='''
+opt(
+    'tab_bar_margin_color',
+    'none',
+    option_type='to_color_or_none',
+    ctype='color_or_none_as_int',
+    long_text="""
 Color for the tab bar margin area. Defaults to using the terminal background
 color for margins above and below the tab bar. For side margins the default
 color is chosen to match the background color of the neighboring tab.
-'''
-    )
+""",
+)
 egr()  # }}}
 
 
 # colors {{{
 agr('colors', 'Color scheme')
 
-opt('foreground', '#dddddd',
-    option_type='to_color', ctype='color_as_int',
-    long_text='The foreground and background colors.'
-    )
+opt('foreground', '#dddddd', option_type='to_color', ctype='color_as_int', long_text='The foreground and background colors.')
 
-opt('background', '#000000',
-    option_type='to_color', ctype='color_as_int',
-    )
+opt(
+    'background',
+    '#000000',
+    option_type='to_color',
+    ctype='color_as_int',
+)
 
 opt(
     'background_opacity',
@@ -1697,8 +2085,12 @@ config.
 """,
 )
 
-opt('background_blur', '0', option_type='int', ctype='int',
-    long_text='''
+opt(
+    'background_blur',
+    '0',
+    option_type='int',
+    ctype='int',
+    long_text="""
 Set to a positive value to enable background blur (blurring of the visuals
 behind a transparent window) on platforms that support it. Only takes effect
 when :opt:`background_opacity` is less than one. On macOS, this will also
@@ -1707,9 +2099,14 @@ a value will cause severe performance issues and/or rendering artifacts.
 Usually, values up to 64 work well. Note that this might cause performance issues,
 depending on how the platform implements it, so use with care. Currently supported
 on macOS and KDE.
-''')
+""",
+)
 
-opt('transparent_background_colors', '', option_type='transparent_background_colors', long_text='''
+opt(
+    'transparent_background_colors',
+    '',
+    option_type='transparent_background_colors',
+    long_text="""
 A space separated list of upto 7 colors, with opacity. When the background color of a cell matches one of these colors,
 it is rendered semi-transparent using the specified opacity.
 
@@ -1724,1398 +2121,1880 @@ part is optional. When unspecified, the value of :opt:`background_opacity` is us
     transparent_background_colors red@0.5 #00ff00@0.3
 
 Note that you must also set :opt:`background_opacity` to something less than 1 for this setting to work properly.
-'''
+""",
 )
 
-opt('dynamic_background_opacity', 'no',
-    option_type='to_bool', ctype='bool',
-    long_text='''
+opt(
+    'dynamic_background_opacity',
+    'no',
+    option_type='to_bool',
+    ctype='bool',
+    long_text="""
 Allow changing of the :opt:`background_opacity` dynamically, using either
 keyboard shortcuts (:sc:`increase_background_opacity` and
 :sc:`decrease_background_opacity`) or the remote control facility. Changing
 this option by reloading the config is not supported.
-'''
-    )
+""",
+)
 
 
-opt('background_image', 'none',
-    option_type='config_or_absolute_path', ctype='!background_image',
+opt(
+    'background_image',
+    'none',
+    option_type='config_or_absolute_path',
+    ctype='!background_image',
     long_text='Path to a background image. Must be in PNG/JPEG/WEBP/TIFF/GIF/BMP format.'
-    ' Note that when using :ref:`auto_color_scheme` this option is overridden by the color scheme file and must be set inside it to take effect.'
-    )
+    ' Note that when using :ref:`auto_color_scheme` this option is overridden by the color scheme file and must be set inside it to take effect.',
+)
 
-opt('background_image_layout', 'tiled',
+opt(
+    'background_image_layout',
+    'tiled',
     choices=('mirror-tiled', 'scaled', 'tiled', 'clamped', 'centered', 'cscaled'),
     ctype='bglayout',
-    long_text='''
+    long_text="""
 Whether to tile, scale or clamp the background image. The value can be one of
 :code:`tiled`, :code:`mirror-tiled`, :code:`scaled`, :code:`clamped`, :code:`centered`
 or :code:`cscaled`. The :code:`scaled` and :code:`cscaled` values scale the image to the
 window size, with :code:`cscaled` preserving the image aspect ratio.
 Note that when using :ref:`auto_color_scheme` this option is overridden by the color scheme file and must be set inside it to take effect.
-'''
-    )
+""",
+)
 
-opt('background_image_linear', 'no',
-    option_type='to_bool', ctype='bool',
+opt(
+    'background_image_linear',
+    'no',
+    option_type='to_bool',
+    ctype='bool',
     long_text='When background image is scaled, whether linear interpolation should be used.'
-' Note that when using :ref:`auto_color_scheme` this option is overridden by the color scheme file and must be set inside it to take effect.'
-    )
+    ' Note that when using :ref:`auto_color_scheme` this option is overridden by the color scheme file and must be set inside it to take effect.',
+)
 
-opt('background_tint', '0.0',
-    option_type='unit_float', ctype='float',
-    long_text='''
+opt(
+    'background_tint',
+    '0.0',
+    option_type='unit_float',
+    ctype='float',
+    long_text="""
 How much to tint the background image by the background color. This option
 makes it easier to read the text. Tinting is done using the current background
 color for each window. This option applies only if :opt:`background_image` is set.
 Note that when using :ref:`auto_color_scheme` this option is overridden by the color scheme file and must be set inside it to take effect.
-'''
-    )
+""",
+)
 
-opt('background_tint_gaps', '1.0',
-    option_type='unit_float', ctype='float',
-    long_text='''
+opt(
+    'background_tint_gaps',
+    '1.0',
+    option_type='unit_float',
+    ctype='float',
+    long_text="""
 How much to tint the background image at the window gaps by the background
 color, after applying :opt:`background_tint`. Since this is multiplicative
 with :opt:`background_tint`, it can be used to lighten the tint over the window
 gaps for a *separated* look.
 Note that when using :ref:`auto_color_scheme` this option is overridden by the color scheme file and must be set inside it to take effect.
-'''
-    )
+""",
+)
 
-opt('dim_opacity', '0.4',
-    option_type='unit_float', ctype='float',
-    long_text='''
+opt(
+    'dim_opacity',
+    '0.4',
+    option_type='unit_float',
+    ctype='float',
+    long_text="""
 How much to dim text that has the DIM/FAINT attribute set. One means no dimming
 and zero means fully dimmed (i.e. invisible).
-'''
-    )
+""",
+)
 
-opt('selection_foreground', '#000000',
+opt(
+    'selection_foreground',
+    '#000000',
     option_type='to_color_or_none',
-    long_text='''
+    long_text="""
 The foreground and background colors for text selected with the mouse. Setting
 both of these to :code:`none` will cause a "reverse video" effect for
 selections, where the selection will be the cell text color and the text will
 become the cell background color. Setting only selection_foreground to
 :code:`none` will cause the foreground color to be used unchanged. Note that
 these colors can be overridden by the program running in the terminal.
-'''
-    )
+""",
+)
 
-opt('selection_background', '#fffacd',
+opt(
+    'selection_background',
+    '#fffacd',
     option_type='to_color_or_none',
-    )
+)
 
 
 # colors.table {{{
-agr('colors.table', 'The color table', '''
+agr(
+    'colors.table',
+    'The color table',
+    """
 The 256 terminal colors. There are 8 basic colors, each color has a dull and
 bright version, for the first 16 colors. You can set the remaining 240 colors as
 color16 to color255.
-''')
+""",
+)
 
-opt('color0', '#000000',
-    option_type='to_color',
-    long_text='black'
-    )
+opt('color0', '#000000', option_type='to_color', long_text='black')
 
-opt('color8', '#767676',
+opt(
+    'color8',
+    '#767676',
     option_type='to_color',
-    )
+)
 
-opt('color1', '#cc0403',
-    option_type='to_color',
-    long_text='red'
-    )
+opt('color1', '#cc0403', option_type='to_color', long_text='red')
 
-opt('color9', '#f2201f',
+opt(
+    'color9',
+    '#f2201f',
     option_type='to_color',
-    )
+)
 
-opt('color2', '#19cb00',
-    option_type='to_color',
-    long_text='green'
-    )
+opt('color2', '#19cb00', option_type='to_color', long_text='green')
 
-opt('color10', '#23fd00',
+opt(
+    'color10',
+    '#23fd00',
     option_type='to_color',
-    )
+)
 
-opt('color3', '#cecb00',
-    option_type='to_color',
-    long_text='yellow'
-    )
+opt('color3', '#cecb00', option_type='to_color', long_text='yellow')
 
-opt('color11', '#fffd00',
+opt(
+    'color11',
+    '#fffd00',
     option_type='to_color',
-    )
+)
 
-opt('color4', '#0d73cc',
-    option_type='to_color',
-    long_text='blue'
-    )
+opt('color4', '#0d73cc', option_type='to_color', long_text='blue')
 
-opt('color12', '#1a8fff',
+opt(
+    'color12',
+    '#1a8fff',
     option_type='to_color',
-    )
+)
 
-opt('color5', '#cb1ed1',
-    option_type='to_color',
-    long_text='magenta'
-    )
+opt('color5', '#cb1ed1', option_type='to_color', long_text='magenta')
 
-opt('color13', '#fd28ff',
+opt(
+    'color13',
+    '#fd28ff',
     option_type='to_color',
-    )
+)
 
-opt('color6', '#0dcdcd',
-    option_type='to_color',
-    long_text='cyan'
-    )
+opt('color6', '#0dcdcd', option_type='to_color', long_text='cyan')
 
-opt('color14', '#14ffff',
+opt(
+    'color14',
+    '#14ffff',
     option_type='to_color',
-    )
+)
 
-opt('color7', '#dddddd',
-    option_type='to_color',
-    long_text='white'
-    )
+opt('color7', '#dddddd', option_type='to_color', long_text='white')
 
-opt('color15', '#ffffff',
+opt(
+    'color15',
+    '#ffffff',
     option_type='to_color',
-    )
+)
 
-opt('mark1_foreground', 'black',
-    option_type='to_color',
-    long_text='Color for marks of type 1'
-    )
+opt('mark1_foreground', 'black', option_type='to_color', long_text='Color for marks of type 1')
 
-opt('mark1_background', '#98d3cb',
-    option_type='to_color',
-    long_text='Color for marks of type 1 (light steel blue)'
-    )
+opt('mark1_background', '#98d3cb', option_type='to_color', long_text='Color for marks of type 1 (light steel blue)')
 
-opt('mark2_foreground', 'black',
-    option_type='to_color',
-    long_text='Color for marks of type 2'
-    )
+opt('mark2_foreground', 'black', option_type='to_color', long_text='Color for marks of type 2')
 
-opt('mark2_background', '#f2dcd3',
-    option_type='to_color',
-    long_text='Color for marks of type 1 (beige)'
-    )
+opt('mark2_background', '#f2dcd3', option_type='to_color', long_text='Color for marks of type 1 (beige)')
 
-opt('mark3_foreground', 'black',
-    option_type='to_color',
-    long_text='Color for marks of type 3'
-    )
+opt('mark3_foreground', 'black', option_type='to_color', long_text='Color for marks of type 3')
 
-opt('mark3_background', '#f274bc',
-    option_type='to_color',
-    long_text='Color for marks of type 3 (violet)'
-    )
+opt('mark3_background', '#f274bc', option_type='to_color', long_text='Color for marks of type 3 (violet)')
 
-opt('color16', '#000000',
+opt(
+    'color16',
+    '#000000',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color17', '#00005f',
+opt(
+    'color17',
+    '#00005f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color18', '#000087',
+opt(
+    'color18',
+    '#000087',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color19', '#0000af',
+opt(
+    'color19',
+    '#0000af',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color20', '#0000d7',
+opt(
+    'color20',
+    '#0000d7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color21', '#0000ff',
+opt(
+    'color21',
+    '#0000ff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color22', '#005f00',
+opt(
+    'color22',
+    '#005f00',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color23', '#005f5f',
+opt(
+    'color23',
+    '#005f5f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color24', '#005f87',
+opt(
+    'color24',
+    '#005f87',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color25', '#005faf',
+opt(
+    'color25',
+    '#005faf',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color26', '#005fd7',
+opt(
+    'color26',
+    '#005fd7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color27', '#005fff',
+opt(
+    'color27',
+    '#005fff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color28', '#008700',
+opt(
+    'color28',
+    '#008700',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color29', '#00875f',
+opt(
+    'color29',
+    '#00875f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color30', '#008787',
+opt(
+    'color30',
+    '#008787',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color31', '#0087af',
+opt(
+    'color31',
+    '#0087af',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color32', '#0087d7',
+opt(
+    'color32',
+    '#0087d7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color33', '#0087ff',
+opt(
+    'color33',
+    '#0087ff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color34', '#00af00',
+opt(
+    'color34',
+    '#00af00',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color35', '#00af5f',
+opt(
+    'color35',
+    '#00af5f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color36', '#00af87',
+opt(
+    'color36',
+    '#00af87',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color37', '#00afaf',
+opt(
+    'color37',
+    '#00afaf',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color38', '#00afd7',
+opt(
+    'color38',
+    '#00afd7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color39', '#00afff',
+opt(
+    'color39',
+    '#00afff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color40', '#00d700',
+opt(
+    'color40',
+    '#00d700',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color41', '#00d75f',
+opt(
+    'color41',
+    '#00d75f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color42', '#00d787',
+opt(
+    'color42',
+    '#00d787',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color43', '#00d7af',
+opt(
+    'color43',
+    '#00d7af',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color44', '#00d7d7',
+opt(
+    'color44',
+    '#00d7d7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color45', '#00d7ff',
+opt(
+    'color45',
+    '#00d7ff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color46', '#00ff00',
+opt(
+    'color46',
+    '#00ff00',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color47', '#00ff5f',
+opt(
+    'color47',
+    '#00ff5f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color48', '#00ff87',
+opt(
+    'color48',
+    '#00ff87',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color49', '#00ffaf',
+opt(
+    'color49',
+    '#00ffaf',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color50', '#00ffd7',
+opt(
+    'color50',
+    '#00ffd7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color51', '#00ffff',
+opt(
+    'color51',
+    '#00ffff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color52', '#5f0000',
+opt(
+    'color52',
+    '#5f0000',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color53', '#5f005f',
+opt(
+    'color53',
+    '#5f005f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color54', '#5f0087',
+opt(
+    'color54',
+    '#5f0087',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color55', '#5f00af',
+opt(
+    'color55',
+    '#5f00af',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color56', '#5f00d7',
+opt(
+    'color56',
+    '#5f00d7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color57', '#5f00ff',
+opt(
+    'color57',
+    '#5f00ff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color58', '#5f5f00',
+opt(
+    'color58',
+    '#5f5f00',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color59', '#5f5f5f',
+opt(
+    'color59',
+    '#5f5f5f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color60', '#5f5f87',
+opt(
+    'color60',
+    '#5f5f87',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color61', '#5f5faf',
+opt(
+    'color61',
+    '#5f5faf',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color62', '#5f5fd7',
+opt(
+    'color62',
+    '#5f5fd7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color63', '#5f5fff',
+opt(
+    'color63',
+    '#5f5fff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color64', '#5f8700',
+opt(
+    'color64',
+    '#5f8700',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color65', '#5f875f',
+opt(
+    'color65',
+    '#5f875f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color66', '#5f8787',
+opt(
+    'color66',
+    '#5f8787',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color67', '#5f87af',
+opt(
+    'color67',
+    '#5f87af',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color68', '#5f87d7',
+opt(
+    'color68',
+    '#5f87d7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color69', '#5f87ff',
+opt(
+    'color69',
+    '#5f87ff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color70', '#5faf00',
+opt(
+    'color70',
+    '#5faf00',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color71', '#5faf5f',
+opt(
+    'color71',
+    '#5faf5f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color72', '#5faf87',
+opt(
+    'color72',
+    '#5faf87',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color73', '#5fafaf',
+opt(
+    'color73',
+    '#5fafaf',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color74', '#5fafd7',
+opt(
+    'color74',
+    '#5fafd7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color75', '#5fafff',
+opt(
+    'color75',
+    '#5fafff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color76', '#5fd700',
+opt(
+    'color76',
+    '#5fd700',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color77', '#5fd75f',
+opt(
+    'color77',
+    '#5fd75f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color78', '#5fd787',
+opt(
+    'color78',
+    '#5fd787',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color79', '#5fd7af',
+opt(
+    'color79',
+    '#5fd7af',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color80', '#5fd7d7',
+opt(
+    'color80',
+    '#5fd7d7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color81', '#5fd7ff',
+opt(
+    'color81',
+    '#5fd7ff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color82', '#5fff00',
+opt(
+    'color82',
+    '#5fff00',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color83', '#5fff5f',
+opt(
+    'color83',
+    '#5fff5f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color84', '#5fff87',
+opt(
+    'color84',
+    '#5fff87',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color85', '#5fffaf',
+opt(
+    'color85',
+    '#5fffaf',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color86', '#5fffd7',
+opt(
+    'color86',
+    '#5fffd7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color87', '#5fffff',
+opt(
+    'color87',
+    '#5fffff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color88', '#870000',
+opt(
+    'color88',
+    '#870000',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color89', '#87005f',
+opt(
+    'color89',
+    '#87005f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color90', '#870087',
+opt(
+    'color90',
+    '#870087',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color91', '#8700af',
+opt(
+    'color91',
+    '#8700af',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color92', '#8700d7',
+opt(
+    'color92',
+    '#8700d7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color93', '#8700ff',
+opt(
+    'color93',
+    '#8700ff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color94', '#875f00',
+opt(
+    'color94',
+    '#875f00',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color95', '#875f5f',
+opt(
+    'color95',
+    '#875f5f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color96', '#875f87',
+opt(
+    'color96',
+    '#875f87',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color97', '#875faf',
+opt(
+    'color97',
+    '#875faf',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color98', '#875fd7',
+opt(
+    'color98',
+    '#875fd7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color99', '#875fff',
+opt(
+    'color99',
+    '#875fff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color100', '#878700',
+opt(
+    'color100',
+    '#878700',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color101', '#87875f',
+opt(
+    'color101',
+    '#87875f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color102', '#878787',
+opt(
+    'color102',
+    '#878787',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color103', '#8787af',
+opt(
+    'color103',
+    '#8787af',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color104', '#8787d7',
+opt(
+    'color104',
+    '#8787d7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color105', '#8787ff',
+opt(
+    'color105',
+    '#8787ff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color106', '#87af00',
+opt(
+    'color106',
+    '#87af00',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color107', '#87af5f',
+opt(
+    'color107',
+    '#87af5f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color108', '#87af87',
+opt(
+    'color108',
+    '#87af87',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color109', '#87afaf',
+opt(
+    'color109',
+    '#87afaf',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color110', '#87afd7',
+opt(
+    'color110',
+    '#87afd7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color111', '#87afff',
+opt(
+    'color111',
+    '#87afff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color112', '#87d700',
+opt(
+    'color112',
+    '#87d700',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color113', '#87d75f',
+opt(
+    'color113',
+    '#87d75f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color114', '#87d787',
+opt(
+    'color114',
+    '#87d787',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color115', '#87d7af',
+opt(
+    'color115',
+    '#87d7af',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color116', '#87d7d7',
+opt(
+    'color116',
+    '#87d7d7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color117', '#87d7ff',
+opt(
+    'color117',
+    '#87d7ff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color118', '#87ff00',
+opt(
+    'color118',
+    '#87ff00',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color119', '#87ff5f',
+opt(
+    'color119',
+    '#87ff5f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color120', '#87ff87',
+opt(
+    'color120',
+    '#87ff87',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color121', '#87ffaf',
+opt(
+    'color121',
+    '#87ffaf',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color122', '#87ffd7',
+opt(
+    'color122',
+    '#87ffd7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color123', '#87ffff',
+opt(
+    'color123',
+    '#87ffff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color124', '#af0000',
+opt(
+    'color124',
+    '#af0000',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color125', '#af005f',
+opt(
+    'color125',
+    '#af005f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color126', '#af0087',
+opt(
+    'color126',
+    '#af0087',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color127', '#af00af',
+opt(
+    'color127',
+    '#af00af',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color128', '#af00d7',
+opt(
+    'color128',
+    '#af00d7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color129', '#af00ff',
+opt(
+    'color129',
+    '#af00ff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color130', '#af5f00',
+opt(
+    'color130',
+    '#af5f00',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color131', '#af5f5f',
+opt(
+    'color131',
+    '#af5f5f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color132', '#af5f87',
+opt(
+    'color132',
+    '#af5f87',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color133', '#af5faf',
+opt(
+    'color133',
+    '#af5faf',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color134', '#af5fd7',
+opt(
+    'color134',
+    '#af5fd7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color135', '#af5fff',
+opt(
+    'color135',
+    '#af5fff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color136', '#af8700',
+opt(
+    'color136',
+    '#af8700',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color137', '#af875f',
+opt(
+    'color137',
+    '#af875f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color138', '#af8787',
+opt(
+    'color138',
+    '#af8787',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color139', '#af87af',
+opt(
+    'color139',
+    '#af87af',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color140', '#af87d7',
+opt(
+    'color140',
+    '#af87d7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color141', '#af87ff',
+opt(
+    'color141',
+    '#af87ff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color142', '#afaf00',
+opt(
+    'color142',
+    '#afaf00',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color143', '#afaf5f',
+opt(
+    'color143',
+    '#afaf5f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color144', '#afaf87',
+opt(
+    'color144',
+    '#afaf87',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color145', '#afafaf',
+opt(
+    'color145',
+    '#afafaf',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color146', '#afafd7',
+opt(
+    'color146',
+    '#afafd7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color147', '#afafff',
+opt(
+    'color147',
+    '#afafff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color148', '#afd700',
+opt(
+    'color148',
+    '#afd700',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color149', '#afd75f',
+opt(
+    'color149',
+    '#afd75f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color150', '#afd787',
+opt(
+    'color150',
+    '#afd787',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color151', '#afd7af',
+opt(
+    'color151',
+    '#afd7af',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color152', '#afd7d7',
+opt(
+    'color152',
+    '#afd7d7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color153', '#afd7ff',
+opt(
+    'color153',
+    '#afd7ff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color154', '#afff00',
+opt(
+    'color154',
+    '#afff00',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color155', '#afff5f',
+opt(
+    'color155',
+    '#afff5f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color156', '#afff87',
+opt(
+    'color156',
+    '#afff87',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color157', '#afffaf',
+opt(
+    'color157',
+    '#afffaf',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color158', '#afffd7',
+opt(
+    'color158',
+    '#afffd7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color159', '#afffff',
+opt(
+    'color159',
+    '#afffff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color160', '#d70000',
+opt(
+    'color160',
+    '#d70000',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color161', '#d7005f',
+opt(
+    'color161',
+    '#d7005f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color162', '#d70087',
+opt(
+    'color162',
+    '#d70087',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color163', '#d700af',
+opt(
+    'color163',
+    '#d700af',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color164', '#d700d7',
+opt(
+    'color164',
+    '#d700d7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color165', '#d700ff',
+opt(
+    'color165',
+    '#d700ff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color166', '#d75f00',
+opt(
+    'color166',
+    '#d75f00',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color167', '#d75f5f',
+opt(
+    'color167',
+    '#d75f5f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color168', '#d75f87',
+opt(
+    'color168',
+    '#d75f87',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color169', '#d75faf',
+opt(
+    'color169',
+    '#d75faf',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color170', '#d75fd7',
+opt(
+    'color170',
+    '#d75fd7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color171', '#d75fff',
+opt(
+    'color171',
+    '#d75fff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color172', '#d78700',
+opt(
+    'color172',
+    '#d78700',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color173', '#d7875f',
+opt(
+    'color173',
+    '#d7875f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color174', '#d78787',
+opt(
+    'color174',
+    '#d78787',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color175', '#d787af',
+opt(
+    'color175',
+    '#d787af',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color176', '#d787d7',
+opt(
+    'color176',
+    '#d787d7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color177', '#d787ff',
+opt(
+    'color177',
+    '#d787ff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color178', '#d7af00',
+opt(
+    'color178',
+    '#d7af00',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color179', '#d7af5f',
+opt(
+    'color179',
+    '#d7af5f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color180', '#d7af87',
+opt(
+    'color180',
+    '#d7af87',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color181', '#d7afaf',
+opt(
+    'color181',
+    '#d7afaf',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color182', '#d7afd7',
+opt(
+    'color182',
+    '#d7afd7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color183', '#d7afff',
+opt(
+    'color183',
+    '#d7afff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color184', '#d7d700',
+opt(
+    'color184',
+    '#d7d700',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color185', '#d7d75f',
+opt(
+    'color185',
+    '#d7d75f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color186', '#d7d787',
+opt(
+    'color186',
+    '#d7d787',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color187', '#d7d7af',
+opt(
+    'color187',
+    '#d7d7af',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color188', '#d7d7d7',
+opt(
+    'color188',
+    '#d7d7d7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color189', '#d7d7ff',
+opt(
+    'color189',
+    '#d7d7ff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color190', '#d7ff00',
+opt(
+    'color190',
+    '#d7ff00',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color191', '#d7ff5f',
+opt(
+    'color191',
+    '#d7ff5f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color192', '#d7ff87',
+opt(
+    'color192',
+    '#d7ff87',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color193', '#d7ffaf',
+opt(
+    'color193',
+    '#d7ffaf',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color194', '#d7ffd7',
+opt(
+    'color194',
+    '#d7ffd7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color195', '#d7ffff',
+opt(
+    'color195',
+    '#d7ffff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color196', '#ff0000',
+opt(
+    'color196',
+    '#ff0000',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color197', '#ff005f',
+opt(
+    'color197',
+    '#ff005f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color198', '#ff0087',
+opt(
+    'color198',
+    '#ff0087',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color199', '#ff00af',
+opt(
+    'color199',
+    '#ff00af',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color200', '#ff00d7',
+opt(
+    'color200',
+    '#ff00d7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color201', '#ff00ff',
+opt(
+    'color201',
+    '#ff00ff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color202', '#ff5f00',
+opt(
+    'color202',
+    '#ff5f00',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color203', '#ff5f5f',
+opt(
+    'color203',
+    '#ff5f5f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color204', '#ff5f87',
+opt(
+    'color204',
+    '#ff5f87',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color205', '#ff5faf',
+opt(
+    'color205',
+    '#ff5faf',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color206', '#ff5fd7',
+opt(
+    'color206',
+    '#ff5fd7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color207', '#ff5fff',
+opt(
+    'color207',
+    '#ff5fff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color208', '#ff8700',
+opt(
+    'color208',
+    '#ff8700',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color209', '#ff875f',
+opt(
+    'color209',
+    '#ff875f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color210', '#ff8787',
+opt(
+    'color210',
+    '#ff8787',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color211', '#ff87af',
+opt(
+    'color211',
+    '#ff87af',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color212', '#ff87d7',
+opt(
+    'color212',
+    '#ff87d7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color213', '#ff87ff',
+opt(
+    'color213',
+    '#ff87ff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color214', '#ffaf00',
+opt(
+    'color214',
+    '#ffaf00',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color215', '#ffaf5f',
+opt(
+    'color215',
+    '#ffaf5f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color216', '#ffaf87',
+opt(
+    'color216',
+    '#ffaf87',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color217', '#ffafaf',
+opt(
+    'color217',
+    '#ffafaf',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color218', '#ffafd7',
+opt(
+    'color218',
+    '#ffafd7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color219', '#ffafff',
+opt(
+    'color219',
+    '#ffafff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color220', '#ffd700',
+opt(
+    'color220',
+    '#ffd700',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color221', '#ffd75f',
+opt(
+    'color221',
+    '#ffd75f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color222', '#ffd787',
+opt(
+    'color222',
+    '#ffd787',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color223', '#ffd7af',
+opt(
+    'color223',
+    '#ffd7af',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color224', '#ffd7d7',
+opt(
+    'color224',
+    '#ffd7d7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color225', '#ffd7ff',
+opt(
+    'color225',
+    '#ffd7ff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color226', '#ffff00',
+opt(
+    'color226',
+    '#ffff00',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color227', '#ffff5f',
+opt(
+    'color227',
+    '#ffff5f',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color228', '#ffff87',
+opt(
+    'color228',
+    '#ffff87',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color229', '#ffffaf',
+opt(
+    'color229',
+    '#ffffaf',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color230', '#ffffd7',
+opt(
+    'color230',
+    '#ffffd7',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color231', '#ffffff',
+opt(
+    'color231',
+    '#ffffff',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color232', '#080808',
+opt(
+    'color232',
+    '#080808',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color233', '#121212',
+opt(
+    'color233',
+    '#121212',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color234', '#1c1c1c',
+opt(
+    'color234',
+    '#1c1c1c',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color235', '#262626',
+opt(
+    'color235',
+    '#262626',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color236', '#303030',
+opt(
+    'color236',
+    '#303030',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color237', '#3a3a3a',
+opt(
+    'color237',
+    '#3a3a3a',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color238', '#444444',
+opt(
+    'color238',
+    '#444444',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color239', '#4e4e4e',
+opt(
+    'color239',
+    '#4e4e4e',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color240', '#585858',
+opt(
+    'color240',
+    '#585858',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color241', '#626262',
+opt(
+    'color241',
+    '#626262',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color242', '#6c6c6c',
+opt(
+    'color242',
+    '#6c6c6c',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color243', '#767676',
+opt(
+    'color243',
+    '#767676',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color244', '#808080',
+opt(
+    'color244',
+    '#808080',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color245', '#8a8a8a',
+opt(
+    'color245',
+    '#8a8a8a',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color246', '#949494',
+opt(
+    'color246',
+    '#949494',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color247', '#9e9e9e',
+opt(
+    'color247',
+    '#9e9e9e',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color248', '#a8a8a8',
+opt(
+    'color248',
+    '#a8a8a8',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color249', '#b2b2b2',
+opt(
+    'color249',
+    '#b2b2b2',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color250', '#bcbcbc',
+opt(
+    'color250',
+    '#bcbcbc',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color251', '#c6c6c6',
+opt(
+    'color251',
+    '#c6c6c6',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color252', '#d0d0d0',
+opt(
+    'color252',
+    '#d0d0d0',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color253', '#dadada',
+opt(
+    'color253',
+    '#dadada',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color254', '#e4e4e4',
+opt(
+    'color254',
+    '#e4e4e4',
     option_type='to_color',
     documented=False,
-    )
+)
 
-opt('color255', '#eeeeee',
+opt(
+    'color255',
+    '#eeeeee',
     option_type='to_color',
     documented=False,
-    )
+)
 egr()  # }}}
 egr()  # }}}
 
@@ -3123,19 +4002,23 @@ egr()  # }}}
 # advanced {{{
 agr('advanced', 'Advanced')
 
-opt('shell', '.',
-    long_text='''
+opt(
+    'shell',
+    '.',
+    long_text="""
 The shell program to execute. The default value of :code:`.` means to use
 the value of of the :envvar:`SHELL` environment variable or if unset,
 whatever shell is set as the default shell for the current user. Note that on
 macOS if you change this, you might need to add :code:`--login` and
 :code:`--interactive` to ensure that the shell starts in interactive mode and
 reads its startup rc files. Environment variables are expanded in this setting.
-'''
-    )
+""",
+)
 
-opt('editor', '.',
-    long_text='''
+opt(
+    'editor',
+    '.',
+    long_text="""
 The terminal based text editor (such as :program:`vim` or :program:`nano`) to
 use when editing the kitty config file or similar tasks.
 
@@ -3145,12 +4028,15 @@ set, kitty will run your :opt:`shell` (:code:`$SHELL -l -i -c env`) to see if
 your shell startup rc files set :envvar:`VISUAL` or :envvar:`EDITOR`. If that
 doesn't work, kitty will cycle through various known editors (:program:`vim`,
 :program:`emacs`, etc.) and take the first one that exists on your system.
-'''
-    )
+""",
+)
 
-opt('close_on_child_death', 'no',
-    option_type='to_bool', ctype='bool',
-    long_text='''
+opt(
+    'close_on_child_death',
+    'no',
+    option_type='to_bool',
+    ctype='bool',
+    long_text="""
 Close the window when the child process (usually the shell) exits. With the default value
 :code:`no`, the terminal will remain open when the child exits as long as there
 are still other processes outputting to the terminal (for example disowned or
@@ -3158,13 +4044,16 @@ backgrounded processes). When enabled with :code:`yes`, the window will close as
 soon as the child process exits. Note that setting it to :code:`yes` means that
 any background processes still using the terminal can fail silently because
 their stdout/stderr/stdin no longer work.
-'''
-    )
+""",
+)
 
-opt('+remote_control_password', '',
+opt(
+    '+remote_control_password',
+    '',
     option_type='remote_control_password',
-    add_to_default=False, has_secret=True,
-    long_text='''
+    add_to_default=False,
+    has_secret=True,
+    long_text="""
 Allow other programs to control kitty using passwords. This option can be
 specified multiple times to add multiple passwords. If no passwords are present
 kitty will ask the user for permission if a program tries to use remote control
@@ -3195,11 +4084,14 @@ For example::
 
 Relative paths are resolved from the kitty configuration directory.
 See :ref:`rc_custom_auth` for details.
-''')
+""",
+)
 
-opt('allow_remote_control', 'no',
+opt(
+    'allow_remote_control',
+    'no',
     choices=('password', 'socket-only', 'socket', 'no', 'n', 'false', 'yes', 'y', 'true'),
-    long_text='''
+    long_text="""
 Allow other programs to control kitty. If you turn this on, other programs can
 control all aspects of kitty, including sending text to kitty windows, opening
 new windows, closing windows, reading the content of windows, etc. Note that
@@ -3225,11 +4117,13 @@ prevents any form of remote control. The meaning of the various values are:
 
 :code:`yes`
     Remote control requests are always accepted.
-'''
-    )
+""",
+)
 
-opt('listen_on', 'none',
-    long_text='''
+opt(
+    'listen_on',
+    'none',
+    long_text="""
 Listen to the specified socket for remote control connections. Note that this
 will apply to all kitty instances. It can be overridden by the :option:`kitty
 --listen-on` command line option. For UNIX sockets, such as
@@ -3243,13 +4137,15 @@ number is specified.  See the help for :option:`kitty --listen-on` for more
 details. Note that this will be ignored unless :opt:`allow_remote_control` is
 set to either: :code:`yes`, :code:`socket` or :code:`socket-only`.
 Changing this option by reloading the config is not supported.
-'''
-    )
+""",
+)
 
-opt('+env', '',
+opt(
+    '+env',
+    '',
     option_type='env',
     add_to_default=False,
-    long_text='''
+    long_text="""
 Specify the environment variables to be set in all child processes. Using the
 name with an equal sign (e.g. :code:`env VAR=`) will set it to the empty string.
 Specifying only the name (e.g. :code:`env VAR`) will remove the variable from
@@ -3260,10 +4156,15 @@ recursively, for example::
     env VAR2=${HOME}/${VAR1}/b
 
 The value of :code:`VAR2` will be :code:`<path to home directory>/a/b`.
-'''
-    )
+""",
+)
 
-opt('+filter_notification', '', option_type='filter_notification', add_to_default=False, long_text='''
+opt(
+    '+filter_notification',
+    '',
+    option_type='filter_notification',
+    add_to_default=False,
+    long_text="""
 Specify rules to filter out notifications sent by applications running in kitty.
 Can be specified multiple times to create multiple filter rules. A rule specification
 is of the form :code:`field:regexp`. A filter rule
@@ -3284,24 +4185,29 @@ match on the title and body of the notification text. More sophisticated program
 and custom actions on notifications can be done by creating a notifications.py file in the
 kitty config directory (:file:`~/.config/kitty`). An annotated sample is
 :link:`available <https://github.com/kovidgoyal/kitty/blob/master/docs/notifications.py>`.
-''')
+""",
+)
 
-opt('+watcher', '',
+opt(
+    '+watcher',
+    '',
     option_type='store_multiple',
     add_to_default=False,
-    long_text='''
+    long_text="""
 Path to python file which will be loaded for :ref:`watchers`. Can be specified
 more than once to load multiple watchers. The watchers will be added to every
 kitty window. Relative paths are resolved relative to the kitty config
 directory. Note that reloading the config will only affect windows created after
 the reload.
-'''
-    )
+""",
+)
 
-opt('+exe_search_path', '',
+opt(
+    '+exe_search_path',
+    '',
     option_type='store_multiple',
     add_to_default=False,
-    long_text='''
+    long_text="""
 Control where kitty finds the programs to run. The default search order is:
 First search the system wide :code:`PATH`, then :file:`~/.local/bin` and
 :file:`~/bin`. If still not found, the :code:`PATH` defined in the login shell
@@ -3319,24 +4225,28 @@ For example::
     exe_search_path +/some/appended/path
     exe_search_path -/some/excluded/path
 
-'''
-    )
+""",
+)
 
-opt('update_check_interval', '24',
+opt(
+    'update_check_interval',
+    '24',
     option_type='float',
-    long_text='''
+    long_text="""
 The interval to periodically check if an update to kitty is available (in
 hours). If an update is found, a system notification is displayed informing you
 of the available update. The default is to check every 24 hours, set to zero to
 disable. Update checking is only done by the official binary builds. Distro
 packages or source builds do not do update checking. Changing this option by
 reloading the config is not supported.
-'''
-    )
+""",
+)
 
-opt('startup_session', 'none',
+opt(
+    'startup_session',
+    'none',
     option_type='config_or_absolute_path',
-    long_text='''
+    long_text="""
 Path to a session file to use for all kitty instances. Can be overridden by
 using the :option:`kitty --session` :code:`=none` command line option for individual
 instances. See :ref:`sessions` in the kitty documentation for details. Note that
@@ -3344,12 +4254,14 @@ relative paths are interpreted with respect to the kitty config directory.
 Environment variables in the path are expanded. Changing this option by
 reloading the config is not supported. Note that if kitty is invoked with command line
 arguments specifying a command to run, this option is ignored.
-'''
-    )
+""",
+)
 
-opt('clipboard_control', 'write-clipboard write-primary read-clipboard-ask read-primary-ask',
+opt(
+    'clipboard_control',
+    'write-clipboard write-primary read-clipboard-ask read-primary-ask',
     option_type='clipboard_control',
-    long_text='''
+    long_text="""
 Allow programs running in kitty to read and write from the clipboard. You can
 control exactly which actions are allowed. The possible actions are:
 :code:`write-clipboard`, :code:`read-clipboard`, :code:`write-primary`,
@@ -3359,41 +4271,52 @@ for permission when a program tries to read from the clipboard. Note that
 disabling the read confirmation is a security risk as it means that any program,
 even the ones running on a remote server via SSH can read your clipboard. See
 also :opt:`clipboard_max_size`.
-'''
-    )
+""",
+)
 
-opt('clipboard_max_size', '512',
+opt(
+    'clipboard_max_size',
+    '512',
     option_type='positive_float',
-    long_text='''
+    long_text="""
 The maximum size (in MB) of data from programs running in kitty that will be
 stored for writing to the system clipboard. A value of zero means no size limit
 is applied. See also :opt:`clipboard_control`.
-'''
-    )
+""",
+)
 
-opt('file_transfer_confirmation_bypass', '', has_secret=True, long_text='''
+opt(
+    'file_transfer_confirmation_bypass',
+    '',
+    has_secret=True,
+    long_text="""
 The password that can be supplied to the :doc:`file transfer kitten
 </kittens/transfer>` to skip the transfer confirmation prompt. This should only
 be used when initiating transfers from trusted computers, over trusted networks
 or encrypted transports, as it allows any programs running on the remote machine
 to read/write to the local filesystem, without permission.
-'''
-    )
+""",
+)
 
-opt('allow_hyperlinks', 'yes',
-    option_type='allow_hyperlinks', ctype='bool',
-    long_text='''
+opt(
+    'allow_hyperlinks',
+    'yes',
+    option_type='allow_hyperlinks',
+    ctype='bool',
+    long_text="""
 Process :term:`hyperlink <hyperlinks>` escape sequences (OSC 8). If disabled OSC
 8 escape sequences are ignored. Otherwise they become clickable links, that you
 can click with the mouse or by using the :doc:`hints kitten </kittens/hints>`.
 The special value of :code:`ask` means that kitty will ask before opening the
 link when clicked.
-'''
-    )
+""",
+)
 
-opt('shell_integration', 'enabled',
+opt(
+    'shell_integration',
+    'enabled',
     option_type='shell_integration',
-    long_text='''
+    long_text="""
 Enable shell integration on supported shells. This enables features such as
 jumping to previous prompts, browsing the output of the previous command in a
 pager, etc. on supported shells. Set to :code:`disabled` to turn off shell
@@ -3401,24 +4324,28 @@ integration, completely. It is also possible to disable individual features, set
 to a space separated list of these values: :code:`no-rc`, :code:`no-cursor`,
 :code:`no-title`, :code:`no-cwd`, :code:`no-prompt-mark`, :code:`no-complete`, :code:`no-sudo`.
 See :ref:`Shell integration <shell_integration>` for details.
-'''
-    )
+""",
+)
 
-opt('allow_cloning', 'ask',
+opt(
+    'allow_cloning',
+    'ask',
     choices=('yes', 'y', 'true', 'no', 'n', 'false', 'ask'),
-    long_text='''
+    long_text="""
 Control whether programs running in the terminal can request new windows to be
 created. The canonical example is :ref:`clone-in-kitty <clone_shell>`. By
 default, kitty will ask for permission for each clone request. Allowing cloning
 unconditionally gives programs running in the terminal (including over SSH)
 permission to execute arbitrary code, as the user who is running the terminal,
 on the computer that the terminal is running on.
-'''
-    )
+""",
+)
 
-opt('clone_source_strategies', 'venv,conda,env_var,path',
+opt(
+    'clone_source_strategies',
+    'venv,conda,env_var,path',
     option_type='clone_source_strategies',
-    long_text='''
+    long_text="""
 Control what shell code is sourced when running :command:`clone-in-kitty`
 in the newly cloned window. The supported strategies are:
 
@@ -3437,10 +4364,14 @@ in the newly cloned window. The supported strategies are:
 
 This option must be a comma separated list of the above values. Only the
 first valid match, in the order specified, is sourced.
-'''
-    )
+""",
+)
 
-opt('notify_on_cmd_finish', 'never', option_type='notify_on_cmd_finish', long_text='''
+opt(
+    'notify_on_cmd_finish',
+    'never',
+    option_type='notify_on_cmd_finish',
+    long_text="""
 Show a desktop notification when a long-running command finishes
 (needs :opt:`shell_integration`).
 The possible values are:
@@ -3499,11 +4430,13 @@ Some more examples::
     # Do not clear previous notification when next command finishes or window regains focus
     notify_on_cmd_finish invisible 5.0 notify
 
-'''
-    )
+""",
+)
 
-opt('term', 'xterm-kitty',
-    long_text='''
+opt(
+    'term',
+    'xterm-kitty',
+    long_text="""
 The value of the :envvar:`TERM` environment variable to set. Changing this can
 break many terminal programs, only change it if you know what you are doing, not
 because you read some advice on "Stack Overflow" to change it. The
@@ -3513,22 +4446,29 @@ programs you run, and how different the terminal you are changing it to is,
 various things from key-presses, to colors, to various advanced features may not
 work. Changing this option by reloading the config will only affect newly
 created windows.
-'''
-    )
+""",
+)
 
-opt('terminfo_type', 'path', choices=('path', 'direct', 'none'),
-    long_text='''
+opt(
+    'terminfo_type',
+    'path',
+    choices=('path', 'direct', 'none'),
+    long_text="""
 The value of the :envvar:`TERMINFO` environment variable to set. This variable is
 used by programs running in the terminal to search for terminfo databases. The default value
 of :code:`path` causes kitty to set it to a filesystem location containing the
 kitty terminfo database. A value of :code:`direct` means put the entire database into
 the env var directly. This can be useful when connecting to containers, for example. But,
 note that not all software supports this. A value of :code:`none` means do not touch the variable.
-'''
-    )
+""",
+)
 
 
-opt('forward_stdio', 'no', option_type='to_bool', long_text='''
+opt(
+    'forward_stdio',
+    'no',
+    option_type='to_bool',
+    long_text="""
 Forward STDOUT and STDERR of the kitty process to child processes.
 This is useful for debugging as it
 allows child processes to print to kitty's STDOUT directly. For example,
@@ -3537,11 +4477,16 @@ to the parent kitty's STDOUT. Sets the :code:`KITTY_STDIO_FORWARDED=fdnum`
 environment variable so child processes know about the forwarding. Note that
 on macOS this prevents the shell from being run via the login utility so getlogin()
 will not work in programs run in this session.
-''')
+""",
+)
 
-opt('+menu_map', '',
-    option_type='menu_map', add_to_default=False, ctype='!menu_map',
-    long_text='''
+opt(
+    '+menu_map',
+    '',
+    option_type='menu_map',
+    add_to_default=False,
+    ctype='!menu_map',
+    long_text="""
 Specify entries for various menus in kitty. Currently only the global menubar on macOS
 is supported. For example::
 
@@ -3549,8 +4494,8 @@ is supported. For example::
 
 This will create a menu entry named "Launch something special" in an "Actions" menu in the macOS global menubar.
 Sub-menus can be created by adding more levels separated by the :code:`::` characters.
-'''
-    )
+""",
+)
 
 
 egr()  # }}}
@@ -3559,16 +4504,26 @@ egr()  # }}}
 # os {{{
 agr('os', 'OS specific tweaks')
 
-opt('wayland_titlebar_color', 'system', option_type='titlebar_color', ctype='uint', long_text='''
+opt(
+    'wayland_titlebar_color',
+    'system',
+    option_type='titlebar_color',
+    ctype='uint',
+    long_text="""
 The color of the kitty window's titlebar on Wayland systems with client
 side window decorations such as GNOME. A value of :code:`system` means to use
 the default system colors, a value of :code:`background` means to use the
 background color of the currently active kitty window and finally you can use an
 arbitrary color, such as :code:`#12af59` or :code:`red`.
-'''
-    )
+""",
+)
 
-opt('macos_titlebar_color', 'system', option_type='macos_titlebar_color', ctype='int', long_text='''
+opt(
+    'macos_titlebar_color',
+    'system',
+    option_type='macos_titlebar_color',
+    ctype='int',
+    long_text="""
 The color of the kitty window's titlebar on macOS. A value of
 :code:`system` means to use the default system color, :code:`light` or
 :code:`dark` can also be used to set it explicitly. A value of
@@ -3580,12 +4535,15 @@ sets the background color of the entire window and makes the titlebar
 transparent. As such it is incompatible with :opt:`background_opacity`. If you
 want to use both, you are probably better off just hiding the titlebar with
 :opt:`hide_window_decorations`.
-'''
-    )
+""",
+)
 
-opt('macos_option_as_alt', 'no',
-    option_type='macos_option_as_alt', ctype='uint',
-    long_text='''
+opt(
+    'macos_option_as_alt',
+    'no',
+    option_type='macos_option_as_alt',
+    ctype='uint',
+    long_text="""
 Use the :kbd:`Option` key as an :kbd:`Alt` key on macOS. With this set to
 :code:`no`, kitty will use the macOS native :kbd:`Option+Key` to enter Unicode
 character behavior. This will break any :kbd:`Alt+Key` keyboard shortcuts in
@@ -3598,56 +4556,74 @@ vs. :kbd:`Alt+Key`. Also, any kitty shortcuts using :kbd:`Option/Alt+Key` will
 take priority, so that any such key presses will not be passed to terminal
 programs running inside kitty. Changing this option by reloading the config is
 not supported.
-'''
-    )
+""",
+)
 
-opt('macos_hide_from_tasks', 'no',
-    option_type='to_bool', ctype='bool',
-    long_text='''
+opt(
+    'macos_hide_from_tasks',
+    'no',
+    option_type='to_bool',
+    ctype='bool',
+    long_text="""
 Hide the kitty window from running tasks on macOS (:kbd:`⌘+Tab` and the Dock).
 Changing this option by reloading the config is not supported.
-'''
-    )
+""",
+)
 
-opt('macos_quit_when_last_window_closed', 'no',
-    option_type='to_bool', ctype='bool',
-    long_text='''
+opt(
+    'macos_quit_when_last_window_closed',
+    'no',
+    option_type='to_bool',
+    ctype='bool',
+    long_text="""
 Have kitty quit when all the top-level windows are closed on macOS. By default,
 kitty will stay running, even with no open windows, as is the expected behavior
 on macOS.
-'''
-    )
+""",
+)
 
-opt('macos_window_resizable', 'yes',
-    option_type='to_bool', ctype='bool',
-    long_text='''
+opt(
+    'macos_window_resizable',
+    'yes',
+    option_type='to_bool',
+    ctype='bool',
+    long_text="""
 Disable this if you want kitty top-level OS windows to not be resizable on
 macOS.
-'''
-    )
+""",
+)
 
-opt('macos_thicken_font', '0',
-    option_type='positive_float', ctype='float',
-    long_text='''
+opt(
+    'macos_thicken_font',
+    '0',
+    option_type='positive_float',
+    ctype='float',
+    long_text="""
 Draw an extra border around the font with the given width, to increase
 legibility at small font sizes on macOS. For example, a value of :code:`0.75`
 will result in rendering that looks similar to sub-pixel antialiasing at common
 font sizes. Note that in modern kitty, this option is obsolete (although still
 supported). Consider using :opt:`text_composition_strategy` instead.
-'''
-    )
+""",
+)
 
-opt('macos_traditional_fullscreen', 'no',
-    option_type='to_bool', ctype='bool',
-    long_text='''
+opt(
+    'macos_traditional_fullscreen',
+    'no',
+    option_type='to_bool',
+    ctype='bool',
+    long_text="""
 Use the macOS traditional full-screen transition, that is faster, but less
 pretty.
-'''
-    )
+""",
+)
 
-opt('macos_show_window_title_in', 'all',
-    choices=('all', 'menubar', 'none', 'window'), ctype='window_title_in',
-    long_text='''
+opt(
+    'macos_show_window_title_in',
+    'all',
+    choices=('all', 'menubar', 'none', 'window'),
+    ctype='window_title_in',
+    long_text="""
 Control where the window title is displayed on macOS. A value of :code:`window`
 will show the title of the currently active window at the top of the macOS
 window. A value of :code:`menubar` will show the title of the currently active
@@ -3655,30 +4631,38 @@ window in the macOS global menu bar, making use of otherwise wasted space. A
 value of :code:`all` will show the title in both places, and :code:`none` hides
 the title. See :opt:`macos_menubar_title_max_length` for how to control the
 length of the title in the menu bar.
-'''
-    )
+""",
+)
 
-opt('macos_menubar_title_max_length', '0',
-    option_type='positive_int', ctype='int',
-    long_text='''
+opt(
+    'macos_menubar_title_max_length',
+    '0',
+    option_type='positive_int',
+    ctype='int',
+    long_text="""
 The maximum number of characters from the window title to show in the macOS
 global menu bar. Values less than one means that there is no maximum limit.
-'''
-    )
+""",
+)
 
-opt('macos_custom_beam_cursor', 'no',
+opt(
+    'macos_custom_beam_cursor',
+    'no',
     option_type='to_bool',
-    long_text='''
+    long_text="""
 Use a custom mouse cursor for macOS that is easier to see on both light
 and dark backgrounds. Nowadays, the default macOS cursor already comes with a
 white border. WARNING: this might make your mouse cursor invisible on
 dual GPU machines. Changing this option by reloading the config is not supported.
-'''
-    )
+""",
+)
 
-opt('macos_colorspace', 'srgb',
-    choices=('srgb', 'default', 'displayp3'), ctype='macos_colorspace',
-    long_text='''
+opt(
+    'macos_colorspace',
+    'srgb',
+    choices=('srgb', 'default', 'displayp3'),
+    ctype='macos_colorspace',
+    long_text="""
 The colorspace in which to interpret terminal colors. The default of
 :code:`srgb` will cause colors to match those seen in web browsers. The value of
 :code:`default` will use whatever the native colorspace of the display is.
@@ -3686,31 +4670,43 @@ The value of :code:`displayp3` will use Apple's special snowflake display P3
 color space, which will result in over saturated (brighter) colors with some
 color shift. Reloading configuration will change this value only for newly
 created OS windows.
-''')
+""",
+)
 
 
-opt('linux_display_server', 'auto',
+opt(
+    'linux_display_server',
+    'auto',
     choices=('auto', 'wayland', 'x11'),
-    long_text='''
+    long_text="""
 Choose between Wayland and X11 backends. By default, an appropriate backend
 based on the system state is chosen automatically. Set it to :code:`x11` or
 :code:`wayland` to force the choice. Changing this option by reloading the
 config is not supported.
-'''
-    )
+""",
+)
 
-opt('wayland_enable_ime', 'yes', option_type='to_bool', ctype='bool', long_text='''
+opt(
+    'wayland_enable_ime',
+    'yes',
+    option_type='to_bool',
+    ctype='bool',
+    long_text="""
 Enable Input Method Extension on Wayland. This is typically used for
 inputting text in East Asian languages. However, its implementation in
 Wayland is often buggy and introduces latency into the input loop,
 so disable this if you know you dont need it. Changing this option
 by reloading the config is not supported, it will not have any effect.
-''')
+""",
+)
 egr()  # }}}
 
 
 # shortcuts {{{
-agr('shortcuts', 'Keyboard shortcuts', '''
+agr(
+    'shortcuts',
+    'Keyboard shortcuts',
+    """
 Keys are identified simply by their lowercase Unicode characters. For example:
 :code:`a` for the :kbd:`A` key, :code:`[` for the left square bracket key, etc.
 For functional keys, such as :kbd:`Enter` or :kbd:`Escape`, the names are present
@@ -3734,28 +4730,35 @@ Some quick examples to illustrate common tasks::
 
 The full list of actions that can be mapped to key presses is available
 :doc:`here </actions>`.
-''')
+""",
+)
 
-opt('kitty_mod', 'ctrl+shift',
+opt(
+    'kitty_mod',
+    'ctrl+shift',
     option_type='to_modifiers',
-    long_text='''
+    long_text="""
 Special modifier key alias for default shortcuts. You can change the value of
 this option to alter all default shortcuts that use :opt:`kitty_mod`.
-'''
-    )
+""",
+)
 
-opt('clear_all_shortcuts', 'no',
+opt(
+    'clear_all_shortcuts',
+    'no',
     option_type='clear_all_shortcuts',
-    long_text='''
+    long_text="""
 Remove all shortcut definitions up to this point. Useful, for instance, to
 remove the default shortcuts.
-'''
-    )
+""",
+)
 
-opt('+action_alias', 'launch_tab launch --type=tab --cwd=current',
+opt(
+    '+action_alias',
+    'launch_tab launch --type=tab --cwd=current',
     option_type='action_alias',
     add_to_default=False,
-    long_text='''
+    long_text="""
 Define action aliases to avoid repeating the same options in multiple mappings.
 Aliases can be defined for any action and will be expanded recursively. For
 example, the above alias allows you to create mappings to launch a new tab in
@@ -3767,60 +4770,69 @@ the current working directory without duplication::
 Similarly, to alias kitten invocation::
 
     action_alias hints kitten hints --hints-offset=0
-'''
-    )
+""",
+)
 
-opt('+kitten_alias', 'hints hints --hints-offset=0',
+opt(
+    '+kitten_alias',
+    'hints hints --hints-offset=0',
     option_type='kitten_alias',
     add_to_default=False,
-    long_text='''
+    long_text="""
 Like :opt:`action_alias` above, but specifically for kittens. Generally, prefer
 to use :opt:`action_alias`. This option is a legacy version, present for
 backwards compatibility. It causes all invocations of the aliased kitten to be
 substituted. So the example above will cause all invocations of the hints kitten
 to have the :option:`--hints-offset=0 <kitty +kitten hints --hints-offset>`
 option applied.
-'''
-    )
+""",
+)
 
 
 # shortcuts.clipboard {{{
 agr('shortcuts.clipboard', 'Clipboard')
 
-map('Copy to clipboard',
+map(
+    'Copy to clipboard',
     'copy_to_clipboard kitty_mod+c copy_to_clipboard',
-    long_text='''
+    long_text="""
 There is also a :ac:`copy_or_interrupt` action that can be optionally mapped
 to :kbd:`Ctrl+C`. It will copy only if there is a selection and send an
 interrupt otherwise. Similarly, :ac:`copy_and_clear_or_interrupt` will copy
 and clear the selection or send an interrupt if there is no selection.
 The :ac:`copy_or_noop` action will copy if there is a selection and pass
 the key through to the application running in the terminal if there is no selection.
-'''
-    )
-map('Copy to clipboard or pass through',
+""",
+)
+map(
+    'Copy to clipboard or pass through',
     'copy_or_noop cmd+c copy_or_noop',
     only='macos',
-    )
+)
 
-map('Paste from clipboard',
+map(
+    'Paste from clipboard',
     'paste_from_clipboard kitty_mod+v paste_from_clipboard',
-    )
-map('Paste from clipboard',
+)
+map(
+    'Paste from clipboard',
     'paste_from_clipboard cmd+v paste_from_clipboard',
     only='macos',
-    )
+)
 
-map('Paste from selection',
+map(
+    'Paste from selection',
     'paste_from_selection kitty_mod+s paste_from_selection',
-    )
-map('Paste from selection',
+)
+map(
+    'Paste from selection',
     'paste_from_selection shift+insert paste_from_selection',
-    )
+)
 
-map('Pass selection to program',
+map(
+    'Pass selection to program',
     'pass_selection_to_program kitty_mod+o pass_selection_to_program',
-    long_text='''
+    long_text="""
 You can also pass the contents of the current selection to any program with
 :ac:`pass_selection_to_program`. By default, the system's open program is used,
 but you can specify your own, the selection will be passed as a command line
@@ -3832,90 +4844,108 @@ You can pass the current selection to a terminal program running in a new kitty
 window, by using the :code:`@selection` placeholder::
 
     map kitty_mod+y new_window less @selection
-'''
-    )
+""",
+)
 egr()  # }}}
 
 
 # shortcuts.scrolling {{{
 agr('shortcuts.scrolling', 'Scrolling')
 
-map('Scroll line up',
+map(
+    'Scroll line up',
     'scroll_line_up kitty_mod+up scroll_line_up',
-    )
-map('Scroll line up',
+)
+map(
+    'Scroll line up',
     'scroll_line_up kitty_mod+k scroll_line_up',
-    )
-map('Scroll line up',
+)
+map(
+    'Scroll line up',
     'scroll_line_up opt+cmd+page_up scroll_line_up',
     only='macos',
-    )
-map('Scroll line up',
+)
+map(
+    'Scroll line up',
     'scroll_line_up cmd+up scroll_line_up',
     only='macos',
-    )
+)
 
-map('Scroll line down',
+map(
+    'Scroll line down',
     'scroll_line_down kitty_mod+down scroll_line_down',
-    )
-map('Scroll line down',
+)
+map(
+    'Scroll line down',
     'scroll_line_down kitty_mod+j scroll_line_down',
-    )
-map('Scroll line down',
+)
+map(
+    'Scroll line down',
     'scroll_line_down opt+cmd+page_down scroll_line_down',
     only='macos',
-    )
-map('Scroll line down',
+)
+map(
+    'Scroll line down',
     'scroll_line_down cmd+down scroll_line_down',
     only='macos',
-    )
+)
 
-map('Scroll page up',
+map(
+    'Scroll page up',
     'scroll_page_up kitty_mod+page_up scroll_page_up',
-    )
-map('Scroll page up',
+)
+map(
+    'Scroll page up',
     'scroll_page_up cmd+page_up scroll_page_up',
     only='macos',
-    )
+)
 
-map('Scroll page down',
+map(
+    'Scroll page down',
     'scroll_page_down kitty_mod+page_down scroll_page_down',
-    )
-map('Scroll page down',
+)
+map(
+    'Scroll page down',
     'scroll_page_down cmd+page_down scroll_page_down',
     only='macos',
-    )
+)
 
-map('Scroll to top',
+map(
+    'Scroll to top',
     'scroll_home kitty_mod+home scroll_home',
-    )
-map('Scroll to top',
+)
+map(
+    'Scroll to top',
     'scroll_home cmd+home scroll_home',
     only='macos',
-    )
+)
 
-map('Scroll to bottom',
+map(
+    'Scroll to bottom',
     'scroll_end kitty_mod+end scroll_end',
-    )
-map('Scroll to bottom',
+)
+map(
+    'Scroll to bottom',
     'scroll_end cmd+end scroll_end',
     only='macos',
-    )
+)
 
-map('Scroll to previous shell prompt',
+map(
+    'Scroll to previous shell prompt',
     'scroll_to_previous_prompt kitty_mod+z scroll_to_prompt -1',
-    long_text='''
+    long_text="""
 Use a parameter of :code:`0` for :ac:`scroll_to_prompt` to scroll to the last
 jumped to or the last clicked position. Requires :ref:`shell integration
 <shell_integration>` to work.
-'''
-    )
+""",
+)
 
 map('Scroll to next shell prompt', 'scroll_to_next_prompt kitty_mod+x scroll_to_prompt 1')
 
-map('Browse scrollback buffer in pager',
+map(
+    'Browse scrollback buffer in pager',
     'show_scrollback kitty_mod+h show_scrollback',
-    long_text='''
+    long_text="""
 You can pipe the contents of the current screen and history buffer as
 :file:`STDIN` to an arbitrary program using :option:`launch --stdin-source`.
 For example, the following opens the scrollback buffer in less in an
@@ -3925,12 +4955,13 @@ For example, the following opens the scrollback buffer in less in an
 
 For more details on piping screen and buffer contents to external programs,
 see :doc:`launch`.
-'''
-    )
+""",
+)
 
-map('Browse output of the last shell command in pager',
+map(
+    'Browse output of the last shell command in pager',
     'show_last_command_output kitty_mod+g show_last_command_output',
-    long_text='''
+    long_text="""
 You can also define additional shortcuts to get the command output.
 For example, to get the first command output on screen::
 
@@ -3951,17 +4982,18 @@ To get the output of the first command on the screen, use :code:`@first_cmd_outp
 To get the output of the last jumped to command, use :code:`@last_visited_cmd_output`.
 
 Requires :ref:`shell integration <shell_integration>` to work.
-'''
-    )
+""",
+)
 egr()  # }}}
 
 
 # shortcuts.window {{{
 agr('shortcuts.window', 'Window management')
 
-map('New window',
+map(
+    'New window',
     'new_window kitty_mod+enter new_window',
-    long_text='''
+    long_text="""
 You can open a new :term:`kitty window <window>` running an arbitrary program,
 for example::
 
@@ -3986,216 +5018,266 @@ window, with::
     map ctrl+f launch --location=first
 
 For more details, see :doc:`launch`.
-'''
-    )
-map('New window',
+""",
+)
+map(
+    'New window',
     'new_window cmd+enter new_window',
     only='macos',
-    )
+)
 
-map('New OS window',
+map(
+    'New OS window',
     'new_os_window kitty_mod+n new_os_window',
-    long_text='''
+    long_text="""
 Works like :ac:`new_window` above, except that it opens a top-level :term:`OS
 window <os_window>`. In particular you can use :ac:`new_os_window_with_cwd` to
 open a window with the current working directory.
-'''
-    )
-map('New OS window',
+""",
+)
+map(
+    'New OS window',
     'new_os_window cmd+n new_os_window',
     only='macos',
-    )
+)
 
-map('Close window',
+map(
+    'Close window',
     'close_window kitty_mod+w close_window',
-    )
-map('Close window',
+)
+map(
+    'Close window',
     'close_window shift+cmd+d close_window',
     only='macos',
-    )
+)
 
-map('Next window',
+map(
+    'Next window',
     'next_window kitty_mod+] next_window',
-    )
+)
 
-map('Previous window',
+map(
+    'Previous window',
     'previous_window kitty_mod+[ previous_window',
-    )
+)
 
-map('Move window forward',
+map(
+    'Move window forward',
     'move_window_forward kitty_mod+f move_window_forward',
-    )
+)
 
-map('Move window backward',
+map(
+    'Move window backward',
     'move_window_backward kitty_mod+b move_window_backward',
-    )
+)
 
-map('Move window to top',
+map(
+    'Move window to top',
     'move_window_to_top kitty_mod+` move_window_to_top',
-    )
+)
 
-map('Start resizing window',
+map(
+    'Start resizing window',
     'start_resizing_window kitty_mod+r start_resizing_window',
-    )
-map('Start resizing window',
+)
+map(
+    'Start resizing window',
     'start_resizing_window cmd+r start_resizing_window',
     only='macos',
-    )
+)
 
-map('First window',
+map(
+    'First window',
     'first_window kitty_mod+1 first_window',
-    )
-map('First window',
+)
+map(
+    'First window',
     'first_window cmd+1 first_window',
     only='macos',
-    )
+)
 
-map('Second window',
+map(
+    'Second window',
     'second_window kitty_mod+2 second_window',
-    )
-map('Second window',
+)
+map(
+    'Second window',
     'second_window cmd+2 second_window',
     only='macos',
-    )
+)
 
-map('Third window',
+map(
+    'Third window',
     'third_window kitty_mod+3 third_window',
-    )
-map('Third window',
+)
+map(
+    'Third window',
     'third_window cmd+3 third_window',
     only='macos',
-    )
+)
 
-map('Fourth window',
+map(
+    'Fourth window',
     'fourth_window kitty_mod+4 fourth_window',
-    )
-map('Fourth window',
+)
+map(
+    'Fourth window',
     'fourth_window cmd+4 fourth_window',
     only='macos',
-    )
+)
 
-map('Fifth window',
+map(
+    'Fifth window',
     'fifth_window kitty_mod+5 fifth_window',
-    )
-map('Fifth window',
+)
+map(
+    'Fifth window',
     'fifth_window cmd+5 fifth_window',
     only='macos',
-    )
+)
 
-map('Sixth window',
+map(
+    'Sixth window',
     'sixth_window kitty_mod+6 sixth_window',
-    )
-map('Sixth window',
+)
+map(
+    'Sixth window',
     'sixth_window cmd+6 sixth_window',
     only='macos',
-    )
+)
 
-map('Seventh window',
+map(
+    'Seventh window',
     'seventh_window kitty_mod+7 seventh_window',
-    )
-map('Seventh window',
+)
+map(
+    'Seventh window',
     'seventh_window cmd+7 seventh_window',
     only='macos',
-    )
+)
 
-map('Eighth window',
+map(
+    'Eighth window',
     'eighth_window kitty_mod+8 eighth_window',
-    )
-map('Eighth window',
+)
+map(
+    'Eighth window',
     'eighth_window cmd+8 eighth_window',
     only='macos',
-    )
+)
 
-map('Ninth window',
+map(
+    'Ninth window',
     'ninth_window kitty_mod+9 ninth_window',
-    )
-map('Ninth window',
+)
+map(
+    'Ninth window',
     'ninth_window cmd+9 ninth_window',
     only='macos',
-    )
+)
 
-map('Tenth window',
+map(
+    'Tenth window',
     'tenth_window kitty_mod+0 tenth_window',
-    )
+)
 
-map('Visually select and focus window', 'focus_visible_window kitty_mod+f7 focus_visible_window',
-    long_text='''
+map(
+    'Visually select and focus window',
+    'focus_visible_window kitty_mod+f7 focus_visible_window',
+    long_text="""
 Display overlay numbers and alphabets on the window, and switch the focus to the
 window when you press the key. When there are only two windows, the focus will
 be switched directly without displaying the overlay. You can change the overlay
 characters and their order with option :opt:`visual_window_select_characters`.
-'''
-    )
-map('Visually swap window with another', 'swap_with_window kitty_mod+f8 swap_with_window',
-    long_text='''
+""",
+)
+map(
+    'Visually swap window with another',
+    'swap_with_window kitty_mod+f8 swap_with_window',
+    long_text="""
 Works like :ac:`focus_visible_window` above, but swaps the window.
-'''
-    )
+""",
+)
 egr()  # }}}
 
 
 # shortcuts.tab {{{
 agr('shortcuts.tab', 'Tab management')
 
-map('Next tab',
+map(
+    'Next tab',
     'next_tab kitty_mod+right next_tab',
-    )
-map('Next tab',
+)
+map(
+    'Next tab',
     'next_tab shift+cmd+] next_tab',
     only='macos',
-    )
-map('Next tab',
+)
+map(
+    'Next tab',
     'next_tab ctrl+tab next_tab',
-    )
+)
 
-map('Previous tab',
+map(
+    'Previous tab',
     'previous_tab kitty_mod+left previous_tab',
-    )
-map('Previous tab',
+)
+map(
+    'Previous tab',
     'previous_tab shift+cmd+[ previous_tab',
     only='macos',
-    )
-map('Previous tab',
+)
+map(
+    'Previous tab',
     'previous_tab ctrl+shift+tab previous_tab',
-    )
+)
 
-map('New tab',
+map(
+    'New tab',
     'new_tab kitty_mod+t new_tab',
-    )
-map('New tab',
+)
+map(
+    'New tab',
     'new_tab cmd+t new_tab',
     only='macos',
-    )
+)
 
-map('Close tab',
+map(
+    'Close tab',
     'close_tab kitty_mod+q close_tab',
-    )
-map('Close tab',
+)
+map(
+    'Close tab',
     'close_tab cmd+w close_tab',
     only='macos',
-    )
+)
 
-map('Close OS window',
+map(
+    'Close OS window',
     'close_os_window shift+cmd+w close_os_window',
     only='macos',
-    )
+)
 
-map('Move tab forward',
+map(
+    'Move tab forward',
     'move_tab_forward kitty_mod+. move_tab_forward',
-    )
+)
 
-map('Move tab backward',
+map(
+    'Move tab backward',
     'move_tab_backward kitty_mod+, move_tab_backward',
-    )
+)
 
-map('Set tab title',
+map(
+    'Set tab title',
     'set_tab_title kitty_mod+alt+t set_tab_title',
-    )
-map('Set tab title',
+)
+map(
+    'Set tab title',
     'set_tab_title shift+cmd+i set_tab_title',
     only='macos',
-    )
-egr('''
+)
+egr("""
 You can also create shortcuts to go to specific :term:`tabs <tab>`, with
 :code:`1` being the first tab, :code:`2` the second tab and :code:`-1` being the
 previously active tab, :code:`-2` being the tab active before the previously active tab and so on.
@@ -4211,16 +5293,17 @@ if you want the new tab to open next to the current tab rather than at the
 end of the tabs list, use::
 
     map ctrl+t new_tab !neighbor [optional cmd to run]
-''')  # }}}
+""")  # }}}
 
 
 # shortcuts.layout {{{
 agr('shortcuts.layout', 'Layout management')
 
-map('Next layout',
+map(
+    'Next layout',
     'next_layout kitty_mod+l next_layout',
-    )
-egr('''
+)
+egr("""
 You can also create shortcuts to switch to specific :term:`layouts <layout>`::
 
     map ctrl+alt+t goto_layout tall
@@ -4235,60 +5318,76 @@ back to the previous layout if in the named layout. Useful to temporarily "zoom"
 the active window by switching to the stack layout::
 
     map ctrl+alt+z toggle_layout stack
-''')  # }}}
+""")  # }}}
 
 
 # shortcuts.fonts {{{
-agr('shortcuts.fonts', 'Font sizes', '''
+agr(
+    'shortcuts.fonts',
+    'Font sizes',
+    """
 You can change the font size for all top-level kitty OS windows at a time or
 only the current one.
-''')
+""",
+)
 
-map('Increase font size',
+map(
+    'Increase font size',
     'increase_font_size kitty_mod+equal change_font_size all +2.0',
-    )
-map('Increase font size',
+)
+map(
+    'Increase font size',
     'increase_font_size kitty_mod+plus change_font_size all +2.0',
-    )
-map('Increase font size',
+)
+map(
+    'Increase font size',
     'increase_font_size kitty_mod+kp_add change_font_size all +2.0',
-    )
-map('Increase font size',
+)
+map(
+    'Increase font size',
     'increase_font_size cmd+plus change_font_size all +2.0',
     only='macos',
-    )
-map('Increase font size',
+)
+map(
+    'Increase font size',
     'increase_font_size cmd+equal change_font_size all +2.0',
     only='macos',
-    )
-map('Increase font size',
+)
+map(
+    'Increase font size',
     'increase_font_size shift+cmd+equal change_font_size all +2.0',
     only='macos',
-    )
+)
 
-map('Decrease font size',
+map(
+    'Decrease font size',
     'decrease_font_size kitty_mod+minus change_font_size all -2.0',
-    )
-map('Decrease font size',
+)
+map(
+    'Decrease font size',
     'decrease_font_size kitty_mod+kp_subtract change_font_size all -2.0',
-    )
-map('Decrease font size',
+)
+map(
+    'Decrease font size',
     'decrease_font_size cmd+minus change_font_size all -2.0',
     only='macos',
-    )
-map('Decrease font size',
+)
+map(
+    'Decrease font size',
     'decrease_font_size shift+cmd+minus change_font_size all -2.0',
     only='macos',
-    )
+)
 
-map('Reset font size',
+map(
+    'Reset font size',
     'reset_font_size kitty_mod+backspace change_font_size all 0',
-    )
-map('Reset font size',
+)
+map(
+    'Reset font size',
     'reset_font_size cmd+0 change_font_size all 0',
     only='macos',
-    )
-egr('''
+)
+egr("""
 To setup shortcuts for specific font sizes::
 
     map kitty_mod+f6 change_font_size all 10.0
@@ -4301,145 +5400,166 @@ To setup shortcuts to multiply/divide the font size::
 
     map kitty_mod+f6 change_font_size all *2.0
     map kitty_mod+f6 change_font_size all /2.0
-''')  # }}}
+""")  # }}}
 
 
 # shortcuts.selection {{{
-agr('shortcuts.selection', 'Select and act on visible text', '''
+agr(
+    'shortcuts.selection',
+    'Select and act on visible text',
+    """
 Use the hints kitten to select text and either pass it to an external program or
 insert it into the terminal or copy it to the clipboard.
-''')
+""",
+)
 
-map('Open URL',
+map(
+    'Open URL',
     'open_url kitty_mod+e open_url_with_hints',
-    long_text='''
+    long_text="""
 Open a currently visible URL using the keyboard. The program used to open the
 URL is specified in :opt:`open_url_with`.
-'''
-    )
+""",
+)
 
-map('Insert selected path',
+map(
+    'Insert selected path',
     'insert_selected_path kitty_mod+p>f kitten hints --type path --program -',
-    long_text='''
+    long_text="""
 Select a path/filename and insert it into the terminal. Useful, for instance to
 run :program:`git` commands on a filename output from a previous :program:`git`
 command.
-'''
-    )
+""",
+)
 
-map('Open selected path',
+map(
+    'Open selected path',
     'open_selected_path kitty_mod+p>shift+f kitten hints --type path',
-    long_text='Select a path/filename and open it with the default open program.'
-    )
+    long_text='Select a path/filename and open it with the default open program.',
+)
 
-map('Insert selected line',
+map(
+    'Insert selected line',
     'insert_selected_line kitty_mod+p>l kitten hints --type line --program -',
-    long_text='''
+    long_text="""
 Select a line of text and insert it into the terminal. Useful for the output of
 things like: ``ls -1``.
-'''
-    )
+""",
+)
 
-map('Insert selected word',
-    'insert_selected_word kitty_mod+p>w kitten hints --type word --program -',
-    long_text='Select words and insert into terminal.'
-    )
+map('Insert selected word', 'insert_selected_word kitty_mod+p>w kitten hints --type word --program -', long_text='Select words and insert into terminal.')
 
-map('Insert selected hash',
+map(
+    'Insert selected hash',
     'insert_selected_hash kitty_mod+p>h kitten hints --type hash --program -',
-    long_text='''
+    long_text="""
 Select something that looks like a hash and insert it into the terminal. Useful
 with :program:`git`, which uses SHA1 hashes to identify commits.
-'''
-    )
+""",
+)
 
-map('Open the selected file at the selected line',
+map(
+    'Open the selected file at the selected line',
     'goto_file_line kitty_mod+p>n kitten hints --type linenum',
-    long_text='''
+    long_text="""
 Select something that looks like :code:`filename:linenum` and open it in
 your default editor at the specified line number.
-'''
-    )
+""",
+)
 
-map('Open the selected hyperlink',
+map(
+    'Open the selected hyperlink',
     'open_selected_hyperlink kitty_mod+p>y kitten hints --type hyperlink',
-    long_text='''
+    long_text="""
 Select a :term:`hyperlink <hyperlinks>` (i.e. a URL that has been marked as such
 by the terminal program, for example, by ``ls --hyperlink=auto``).
-'''
-    )
-egr('''
+""",
+)
+egr("""
 The hints kitten has many more modes of operation that you can map to different
 shortcuts. For a full description see :doc:`hints kitten </kittens/hints>`.
-''')  # }}}
+""")  # }}}
 
 
 # shortcuts.misc {{{
 agr('shortcuts.misc', 'Miscellaneous')
 
-map('Show documentation',
-    'show_kitty_doc kitty_mod+f1 show_kitty_doc overview')
+map('Show documentation', 'show_kitty_doc kitty_mod+f1 show_kitty_doc overview')
 
-map('Toggle fullscreen',
+map(
+    'Toggle fullscreen',
     'toggle_fullscreen kitty_mod+f11 toggle_fullscreen',
-    )
-map('Toggle fullscreen',
+)
+map(
+    'Toggle fullscreen',
     'toggle_fullscreen ctrl+cmd+f toggle_fullscreen',
     only='macos',
-    )
+)
 
-map('Toggle maximized',
+map(
+    'Toggle maximized',
     'toggle_maximized kitty_mod+f10 toggle_maximized',
-    )
+)
 
-map('Toggle macOS secure keyboard entry',
+map(
+    'Toggle macOS secure keyboard entry',
     'toggle_macos_secure_keyboard_entry opt+cmd+s toggle_macos_secure_keyboard_entry',
     only='macos',
-    )
+)
 
-map('Unicode input',
+map(
+    'Unicode input',
     'input_unicode_character kitty_mod+u kitten unicode_input',
-    )
-map('Unicode input',
+)
+map(
+    'Unicode input',
     'input_unicode_character ctrl+cmd+space kitten unicode_input',
     only='macos',
-    )
+)
 
-map('Edit config file',
+map(
+    'Edit config file',
     'edit_config_file kitty_mod+f2 edit_config_file',
-    )
-map('Edit config file',
+)
+map(
+    'Edit config file',
     'edit_config_file cmd+, edit_config_file',
     only='macos',
-    )
+)
 
-map('Open the kitty command shell',
+map(
+    'Open the kitty command shell',
     'kitty_shell kitty_mod+escape kitty_shell window',
-    long_text='''
+    long_text="""
 Open the kitty shell in a new :code:`window` / :code:`tab` / :code:`overlay` /
 :code:`os_window` to control kitty using commands.
-'''
-    )
+""",
+)
 
-map('Increase background opacity',
+map(
+    'Increase background opacity',
     'increase_background_opacity kitty_mod+a>m set_background_opacity +0.1',
-    )
+)
 
-map('Decrease background opacity',
+map(
+    'Decrease background opacity',
     'decrease_background_opacity kitty_mod+a>l set_background_opacity -0.1',
-    )
+)
 
-map('Make background fully opaque',
+map(
+    'Make background fully opaque',
     'full_background_opacity kitty_mod+a>1 set_background_opacity 1',
-    )
+)
 
-map('Reset background opacity',
+map(
+    'Reset background opacity',
     'reset_background_opacity kitty_mod+a>d set_background_opacity default',
-    )
+)
 
-map('Reset the terminal',
+map(
+    'Reset the terminal',
     'reset_terminal kitty_mod+delete clear_terminal reset active',
-    long_text=r'''
+    long_text=r"""
 You can create shortcuts to clear/reset the terminal. For example::
 
     # Reset the terminal
@@ -4493,39 +5613,44 @@ the screen, instead of just clearing the screen. For ZSH, in :file:`~/.zshrc`, a
 
 Alternatively, you can just add :code:`map ctrl+l clear_terminal to_cursor_scroll active` to :file:`kitty.conf` which
 works with no changes to the shell rc files, but only clears up to the prompt, it does not clear any text at the prompt itself.
-'''
-    )
+""",
+)
 
-map('Reset the terminal',
+map(
+    'Reset the terminal',
     'reset_terminal opt+cmd+r clear_terminal reset active',
     only='macos',
-    )
+)
 
-map('Clear to start',
+map(
+    'Clear to start',
     'clear_terminal_and_scrollback cmd+k clear_terminal to_cursor active',
     only='macos',
-    )
+)
 
-map('Clear scrollback',
+map(
+    'Clear scrollback',
     'clear_scrollback option+cmd+k clear_terminal scrollback active',
     only='macos',
-    )
+)
 
-map('Clear the last command',
+map(
+    'Clear the last command',
     'clear_last_command cmd+l clear_terminal last_command active',
     only='macos',
-    )
+)
 
-map('Clear screen',
+map(
+    'Clear screen',
     'clear_screen cmd+ctrl+l clear_terminal to_cursor_scroll active',
     only='macos',
-    )
+)
 
 
-
-map('Reload kitty.conf',
+map(
+    'Reload kitty.conf',
     'reload_config_file kitty_mod+f5 load_config_file',
-    long_text='''
+    long_text="""
 Reload :file:`kitty.conf`, applying any changes since the last time it was
 loaded. Note that a handful of options cannot be dynamically changed and
 require a full restart of kitty. Particularly, when changing shortcuts for
@@ -4536,32 +5661,28 @@ also map a keybinding to load a different config file, for example::
 
 Note that all options from the original :file:`kitty.conf` are discarded, in
 other words the new configuration *replace* the old ones.
-'''
-    )
+""",
+)
 
-map('Reload kitty.conf',
-    'reload_config_file ctrl+cmd+, load_config_file',
-    only='macos'
-    )
+map('Reload kitty.conf', 'reload_config_file ctrl+cmd+, load_config_file', only='macos')
 
-map('Debug kitty configuration',
+map(
+    'Debug kitty configuration',
     'debug_config kitty_mod+f6 debug_config',
-    long_text='''
+    long_text="""
 Show details about exactly what configuration kitty is running with and its host
 environment. Useful for debugging issues.
-'''
-    )
+""",
+)
 
-map('Debug kitty configuration',
-    'debug_config opt+cmd+, debug_config',
-    only='macos'
-    )
+map('Debug kitty configuration', 'debug_config opt+cmd+, debug_config', only='macos')
 
 
-map('Send arbitrary text on key presses',
+map(
+    'Send arbitrary text on key presses',
     'send_text ctrl+shift+alt+h send_text all Hello World',
     add_to_default=False,
-    long_text='''
+    long_text="""
 You can tell kitty to send arbitrary (UTF-8) encoded text to the client program
 when pressing specified shortcut keys. For example::
 
@@ -4588,32 +5709,37 @@ Some more examples::
     map ctrl+alt+a send_text application Word\\eOH
     # Run a command at a shell prompt (like typing the command and pressing Enter)
     map ctrl+alt+a send_text normal,application some command with arguments\\r
-'''
-    )
+""",
+)
 
-map('Open kitty Website',
+map(
+    'Open kitty Website',
     f'open_kitty_website shift+cmd+/ open_url {website_url()}',
     only='macos',
-    )
+)
 
-map('Hide macOS kitty application',
+map(
+    'Hide macOS kitty application',
     'hide_macos_app cmd+h hide_macos_app',
     only='macos',
-    )
+)
 
-map('Hide macOS other applications',
+map(
+    'Hide macOS other applications',
     'hide_macos_other_apps opt+cmd+h hide_macos_other_apps',
     only='macos',
-    )
+)
 
-map('Minimize macOS window',
+map(
+    'Minimize macOS window',
     'minimize_macos_window cmd+m minimize_macos_window',
     only='macos',
-    )
+)
 
-map('Quit kitty',
+map(
+    'Quit kitty',
     'quit cmd+q quit',
     only='macos',
-    )
+)
 egr()  # }}}
 egr()  # }}}
