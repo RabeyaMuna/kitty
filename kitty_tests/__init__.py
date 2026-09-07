@@ -138,7 +138,19 @@ class Callbacks:
         self.bell_count += 1
 
     def on_da1(self) -> None:
-        self.da1.append(da1(get_options()))
+        response = da1(get_options())
+        self.da1.append(response)
+        # Write response only when needs_da1 is set (for fish shells)
+        # Use select check to avoid timing issues
+        if self.pty and getattr(self.pty, 'needs_da1', False):
+            import os
+            import select
+            try:
+                rd, wd, _ = select.select([], [self.pty.master_fd], [], 0)
+                if wd:
+                    os.write(self.pty.master_fd, response.encode('utf-8'))
+            except OSError:
+                pass
 
     def on_activity_since_last_focus(self) -> None:
         pass
@@ -279,10 +291,10 @@ class BaseTest(TestCase):
 
     def create_pty(
             self, argv=None, cols=80, lines=100, scrollback=100, cell_width=10, cell_height=20,
-            options=None, cwd=None, env=None, stdin_fd=None, stdout_fd=None
+            options=None, cwd=None, env=None, stdin_fd=None, stdout_fd=None, needs_da1=False
     ):
         self.set_options(options)
-        return PTY(argv, lines, cols, scrollback, cell_width, cell_height, cwd, env, stdin_fd=stdin_fd, stdout_fd=stdout_fd)
+        return PTY(argv, lines, cols, scrollback, cell_width, cell_height, cwd, env, stdin_fd=stdin_fd, stdout_fd=stdout_fd, needs_da1=needs_da1)
 
     def assertEqualAttributes(self, c1, c2):
         x1, y1, c1.x, c1.y = c1.x, c1.y, 0, 0
@@ -315,8 +327,9 @@ class PTY:
 
     def __init__(
         self, argv=None, rows=25, columns=80, scrollback=100, cell_width=10, cell_height=20,
-        cwd=None, env=None, stdin_fd=None, stdout_fd=None
+        cwd=None, env=None, stdin_fd=None, stdout_fd=None, needs_da1=False
     ):
+        self.needs_da1 = needs_da1
         self.is_child = False
         if isinstance(argv, str):
             argv = shlex.split(argv)

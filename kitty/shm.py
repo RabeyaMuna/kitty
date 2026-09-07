@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # License: GPLv3 Copyright: 2022, Kovid Goyal <kovid at kovidgoyal.net>
 
+from typing import Literal
+
 # This is present in the python stdlib (version 3.7) in
 # multiprocessing.shared_memory. However, it is crippled in various ways, most
 # notably using extremely small filenames.
@@ -105,7 +107,7 @@ class SharedMemory:
     def tell(self) -> int:
         return self.mmap.tell()
 
-    def seek(self, pos: int, whence: int = os.SEEK_SET) -> None:
+    def seek(self, pos: int, whence: Literal[0, 1, 2] = os.SEEK_SET) -> None:
         self.mmap.seek(pos, whence)
 
     def flush(self) -> None:

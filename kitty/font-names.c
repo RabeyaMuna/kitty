@@ -227,7 +227,7 @@ read_STAT_font_table(const uint8_t *table, size_t table_len, PyObject *name_look
     if (_PyTuple_Resize(&design_axes, count_of_design_axis_entries) == -1) return false;
     for (
         const uint8_t *pos = table + offset_to_start_of_design_axes_entries;
-        pos + size_of_design_axis_entry <= table_limit && count < count_of_design_axis_entries;
+        pos + 8 <= table_limit && pos + size_of_design_axis_entry <= table_limit && count < count_of_design_axis_entries;
         pos += size_of_design_axis_entry, count++
     ) {
         p = (uint16_t*)(pos + 4);
@@ -308,7 +308,7 @@ read_fvar_font_table(const uint8_t *table, size_t table_len, PyObject *name_look
     p += 2;
     const uint16_t offset_to_start_of_axis_array = next; next;
     const uint16_t num_of_axis_records = next, size_of_axis_record = next, num_of_name_records = next, size_of_name_record = next;
-    const uint16_t size_of_coordinates = num_of_axis_records * sizeof(int32_t);
+    const uint32_t size_of_coordinates = num_of_axis_records * sizeof(int32_t);
     if (size_of_name_record < size_of_coordinates + 4) {
         PyErr_Format(PyExc_ValueError, "size of name record: %u too small", size_of_name_record); return NULL;
     }
@@ -336,7 +336,7 @@ read_fvar_font_table(const uint8_t *table, size_t table_len, PyObject *name_look
     i = 0;
     if (_PyTuple_Resize(&named_styles, num_of_name_records) == -1) return NULL;
     for (
-        const uint8_t *pos = table + offset_to_start_of_axis_array + num_of_axis_records * size_of_axis_record;
+        const uint8_t *pos = table + offset_to_start_of_axis_array + (uint32_t)num_of_axis_records * size_of_axis_record;
         pos + size_of_name_record <= table + table_len && i < num_of_name_records;
         i++, pos += size_of_name_record
     ) {
@@ -346,7 +346,7 @@ read_fvar_font_table(const uint8_t *table, size_t table_len, PyObject *name_look
         RAII_PyObject(axis_values, PyDict_New());
         if (!axis_values) return NULL;
         for (uint16_t i = 0; i < num_of_axis_records; i++) {
-            const uint8_t *t = table + offset_to_start_of_axis_array + i * size_of_axis_record;
+            const uint8_t *t = table + offset_to_start_of_axis_array + (uint32_t)i * size_of_axis_record;
             memcpy(tag_buf, t, 4);
             RAII_PyObject(pval, PyFloat_FromDouble(next32));
             if (!pval || PyDict_SetItemString(axis_values, tag_buf, pval) != 0) return NULL;

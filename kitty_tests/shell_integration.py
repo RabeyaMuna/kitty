@@ -92,10 +92,12 @@ class ShellIntegration(BaseTest):
         cmd = shlex.split(cmd.format(**locals()))
         env = (setup_env or safe_env_for_running_shell)(cmd, home_dir, rc=rc, shell=shell, with_kitten=self.with_kitten)
         env['KITTY_RUNNING_SHELL_INTEGRATION_TEST'] = '1'
+        # Fish shell requires DA1 handling to avoid parser state corruption
+        needs_da1 = shell == 'fish'
         try:
             if self.with_kitten:
                 cmd = [kitten_exe(), 'run-shell', '--shell', shlex.join(cmd)]
-            pty = self.create_pty(cmd, cwd=home_dir, env=env, cols=180)
+            pty = self.create_pty(cmd, cwd=home_dir, env=env, cols=180, needs_da1=needs_da1)
             i = 10
             while i > 0 and not pty.screen_contents().strip():
                 pty.process_input_from_child()
