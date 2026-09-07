@@ -86,7 +86,7 @@ class ShellIntegration(BaseTest):
     with_kitten = False
 
     @contextmanager
-    def run_shell(self, shell='zsh', rc='', cmd='', setup_env=None, extra_env=None):
+    def run_shell(self, shell='zsh', rc='', cmd='', setup_env=None, extra_env=None, needs_da1=False):
         home_dir = self.home_dir = os.path.realpath(tempfile.mkdtemp())
         cmd = cmd or shell
         cmd = shlex.split(cmd.format(**locals()))
@@ -97,7 +97,7 @@ class ShellIntegration(BaseTest):
         try:
             if self.with_kitten:
                 cmd = [kitten_exe(), 'run-shell', '--shell', shlex.join(cmd)]
-            pty = self.create_pty(cmd, cwd=home_dir, env=env, cols=180)
+            pty = self.create_pty(cmd, cwd=home_dir, env=env, cols=180, needs_da1=needs_da1)
             i = 10
             while i > 0 and not pty.screen_contents().strip():
                 pty.process_input_from_child()
@@ -197,6 +197,7 @@ RPS1="{rps1}"
         with self.run_shell(
             shell='fish',
             extra_env={'KITTY_SI_RUN_COMMAND_AT_STARTUP': 'echo XXX'},
+            needs_da1=True,
             rc=f'''
 set -g fish_greeting
 function fish_prompt; echo -n "{fish_prompt}"; end

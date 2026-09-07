@@ -45,9 +45,10 @@ def draw_multicell(
 
 class Callbacks:
 
-    def __init__(self, pty=None) -> None:
+    def __init__(self, pty=None, needs_da1=False) -> None:
         self.clear()
         self.pty = pty
+        self.needs_da1 = needs_da1
         self.ftc = None
         self.set_pointer_shape = lambda data: None
         self.last_cmd_at = 0
@@ -138,7 +139,21 @@ class Callbacks:
         self.bell_count += 1
 
     def on_da1(self) -> None:
-        self.da1.append(da1(get_options()))
+        da1_response = da1(get_options())
+        self.da1.append(da1_response)
+        if getattr(self, 'needs_da1', False):
+            # Send DA1 response without flushing to avoid reentrant parsing
+            response = '\x1b[' + da1_response
+            self.pty.write_to_child(response, flush=False)
+            # Use select to ensure non-blocking write
+            if self.pty.write_buf:
+                rd, wd, _ = select.select([], [self.pty.master_fd], [], 0)
+                if wd:
+                    try:
+                        n = os.write(self.pty.master_fd, self.pty.write_buf)
+                        self.pty.write_buf = self.pty.write_buf[n:]
+                    except OSError:
+                        pass
 
     def on_activity_since_last_focus(self) -> None:
         pass
@@ -279,10 +294,10 @@ class BaseTest(TestCase):
 
     def create_pty(
             self, argv=None, cols=80, lines=100, scrollback=100, cell_width=10, cell_height=20,
-            options=None, cwd=None, env=None, stdin_fd=None, stdout_fd=None
+            options=None, cwd=None, env=None, stdin_fd=None, stdout_fd=None, needs_da1=False
     ):
         self.set_options(options)
-        return PTY(argv, lines, cols, scrollback, cell_width, cell_height, cwd, env, stdin_fd=stdin_fd, stdout_fd=stdout_fd)
+        return PTY(argv, lines, cols, scrollback, cell_width, cell_height, cwd, env, stdin_fd=stdin_fd, stdout_fd=stdout_fd, needs_da1=needs_da1)
 
     def assertEqualAttributes(self, c1, c2):
         x1, y1, c1.x, c1.y = c1.x, c1.y, 0, 0
@@ -315,7 +330,7 @@ class PTY:
 
     def __init__(
         self, argv=None, rows=25, columns=80, scrollback=100, cell_width=10, cell_height=20,
-        cwd=None, env=None, stdin_fd=None, stdout_fd=None
+        cwd=None, env=None, stdin_fd=None, stdout_fd=None, needs_da1=False
     ):
         self.is_child = False
         if isinstance(argv, str):
@@ -352,8 +367,9 @@ class PTY:
         os.set_blocking(self.master_fd, False)
         self.cell_width = cell_width
         self.cell_height = cell_height
+        self.needs_da1 = needs_da1
         self.set_window_size(rows=rows, columns=columns)
-        self.callbacks = Callbacks(self)
+        self.callbacks = Callbacks(self, needs_da1)
         self.screen = Screen(self.callbacks, rows, columns, scrollback, cell_width, cell_height, 0, self.callbacks)
         self.received_bytes = b''
 
