@@ -5,20 +5,19 @@ from collections.abc import Callable, Iterator, Sequence
 from enum import Enum
 from functools import lru_cache
 from gettext import gettext as _
-from typing import NamedTuple, TypeVar
+from typing import NamedTuple
 
 from .types import run_once
 
 
 class ParseException(Exception):
-
     hide_traceback = True
 
     @property
     def msg(self) -> str:
         if len(self.args) > 0:
             return str(self.args[0])
-        return ""
+        return ''
 
 
 class ExpressionType(Enum):
@@ -35,8 +34,7 @@ class TokenType(Enum):
     EOF = 4
 
 
-T = TypeVar('T')
-GetMatches = Callable[[str, str, set[T]], set[T]]
+GetMatches = Callable[[str, str, set[object]], set[object]]
 
 
 class SearchTreeNode:
@@ -45,10 +43,10 @@ class SearchTreeNode:
     def __init__(self, type: ExpressionType) -> None:
         self.type = type
 
-    def search(self, universal_set: set[T], get_matches: GetMatches[T]) -> set[T]:
+    def search(self, universal_set: set[object], get_matches: GetMatches) -> set[object]:
         return self(universal_set, get_matches)
 
-    def __call__(self, candidates: set[T], get_matches: GetMatches[T]) -> set[T]:
+    def __call__(self, candidates: set[object], get_matches: GetMatches) -> set[object]:
         return set()
 
     def iter_token_nodes(self) -> Iterator['TokenNode']:
@@ -56,12 +54,11 @@ class SearchTreeNode:
 
 
 class OrNode(SearchTreeNode):
-
     def __init__(self, lhs: SearchTreeNode, rhs: SearchTreeNode) -> None:
         self.lhs = lhs
         self.rhs = rhs
 
-    def __call__(self, candidates: set[T], get_matches: GetMatches[T]) -> set[T]:
+    def __call__(self, candidates: set[object], get_matches: GetMatches) -> set[object]:
         lhs = self.lhs(candidates, get_matches)
         return lhs.union(self.rhs(candidates.difference(lhs), get_matches))
 
@@ -77,7 +74,7 @@ class AndNode(SearchTreeNode):
         self.lhs = lhs
         self.rhs = rhs
 
-    def __call__(self, candidates: set[T], get_matches: GetMatches[T]) -> set[T]:
+    def __call__(self, candidates: set[object], get_matches: GetMatches) -> set[object]:
         lhs = self.lhs(candidates, get_matches)
         return self.rhs(lhs, get_matches)
 
@@ -92,7 +89,7 @@ class NotNode(SearchTreeNode):
     def __init__(self, rhs: SearchTreeNode) -> None:
         self.rhs = rhs
 
-    def __call__(self, candidates: set[T], get_matches: GetMatches[T]) -> set[T]:
+    def __call__(self, candidates: set[object], get_matches: GetMatches) -> set[object]:
         return candidates.difference(self.rhs(candidates, get_matches))
 
     def iter_token_nodes(self) -> Iterator['TokenNode']:
@@ -120,13 +117,18 @@ class Token(NamedTuple):
 
 @run_once
 def lex_scanner() -> Callable[[str], tuple[list[Token], str]]:
-    return getattr(re, 'Scanner')([  # type: ignore
+    return getattr(
+        re, 'Scanner'
+    )(
+        [  # type: ignore
             (r'[()]', lambda x, t: Token(TokenType.OPCODE, t)),
             (r'@.+?:[^")\s]+', lambda x, t: Token(TokenType.WORD, str(t))),
             (r'[^"()\s]+', lambda x, t: Token(TokenType.WORD, str(t))),
             (r'".*?((?<!\\)")', lambda x, t: Token(TokenType.QUOTED_WORD, t[1:-1])),
-            (r'\s+',              None)
-    ], flags=re.DOTALL).scan
+            (r'\s+', None),
+        ],
+        flags=re.DOTALL,
+    ).scan
 
 
 @run_once
@@ -135,7 +137,6 @@ def replacements() -> tuple[tuple[str, str], ...]:
 
 
 class NoLocation(ParseException):
-
     def __init__(self, tt: str):
         a, sep, b = tt.partition(':')
         if sep == ':':
@@ -145,7 +146,6 @@ class NoLocation(ParseException):
 
 
 class Parser:
-
     def __init__(self, allow_no_location: bool = False) -> None:
         self.current_token = 0
         self.tokens: list[Token] = []
@@ -192,10 +192,7 @@ class Parser:
                 x = x.replace(v, k[1:])
             return x
 
-        return [
-            Token(tt, unescape(tv) if tt in (TokenType.WORD, TokenType.QUOTED_WORD) else tv)
-            for tt, tv in tokens
-        ]
+        return [Token(tt, unescape(tv) if tt in (TokenType.WORD, TokenType.QUOTED_WORD) else tv) for tt, tv in tokens]
 
     def parse(self, expr: str, locations: Sequence[str]) -> SearchTreeNode:
         self.locations = locations
@@ -220,7 +217,7 @@ class Parser:
             return AndNode(lhs, self.and_expression())
 
         # Account for the optional 'and'
-        if ((self.token_type() in (TokenType.WORD, TokenType.QUOTED_WORD) or self.token() == '(') and self.lcase_token() != 'or'):
+        if (self.token_type() in (TokenType.WORD, TokenType.QUOTED_WORD) or self.token() == '(') and self.lcase_token() != 'or':
             return AndNode(lhs, self.and_expression())
         return lhs
 
@@ -291,7 +288,10 @@ def build_tree(query: str, locations: str | tuple[str, ...], allow_no_location: 
 
 
 def search(
-    query: str, locations: str | tuple[str, ...], universal_set: set[T], get_matches: GetMatches[T],
+    query: str,
+    locations: str | tuple[str, ...],
+    universal_set: set[T],
+    get_matches: GetMatches[T],
     allow_no_location: bool = False,
 ) -> set[T]:
     return build_tree(query, locations, allow_no_location).search(universal_set, get_matches)
