@@ -106,7 +106,7 @@ class SharedMemory:
         return self.mmap.tell()
 
     def seek(self, pos: int, whence: int = os.SEEK_SET) -> None:
-        self.mmap.seek(pos, whence)
+        self.mmap.seek(pos, whence)  # type: ignore[arg-type]
 
     def flush(self) -> None:
         self.mmap.flush()
