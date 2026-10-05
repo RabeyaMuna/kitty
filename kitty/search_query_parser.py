@@ -5,7 +5,7 @@ from collections.abc import Callable, Iterator, Sequence
 from enum import Enum
 from functools import lru_cache
 from gettext import gettext as _
-from typing import NamedTuple, TypeVar
+from typing import AbstractSet, NamedTuple, TypeVar
 
 from .types import run_once
 
@@ -36,7 +36,7 @@ class TokenType(Enum):
 
 
 T = TypeVar('T')
-GetMatches = Callable[[str, str, set[T]], set[T]]
+GetMatches = Callable[[str, str, AbstractSet[T]], AbstractSet[T]]
 
 
 class SearchTreeNode:
@@ -45,10 +45,10 @@ class SearchTreeNode:
     def __init__(self, type: ExpressionType) -> None:
         self.type = type
 
-    def search(self, universal_set: set[T], get_matches: GetMatches[T]) -> set[T]:
+    def search(self, universal_set: AbstractSet[T], get_matches: GetMatches[T]) -> set[T]:
         return self(universal_set, get_matches)
 
-    def __call__(self, candidates: set[T], get_matches: GetMatches[T]) -> set[T]:
+    def __call__(self, candidates: AbstractSet[T], get_matches: GetMatches[T]) -> set[T]:
         return set()
 
     def iter_token_nodes(self) -> Iterator['TokenNode']:
@@ -61,7 +61,7 @@ class OrNode(SearchTreeNode):
         self.lhs = lhs
         self.rhs = rhs
 
-    def __call__(self, candidates: set[T], get_matches: GetMatches[T]) -> set[T]:
+    def __call__(self, candidates: AbstractSet[T], get_matches: GetMatches[T]) -> set[T]:
         lhs = self.lhs(candidates, get_matches)
         return lhs.union(self.rhs(candidates.difference(lhs), get_matches))
 
@@ -77,7 +77,7 @@ class AndNode(SearchTreeNode):
         self.lhs = lhs
         self.rhs = rhs
 
-    def __call__(self, candidates: set[T], get_matches: GetMatches[T]) -> set[T]:
+    def __call__(self, candidates: AbstractSet[T], get_matches: GetMatches[T]) -> set[T]:
         lhs = self.lhs(candidates, get_matches)
         return self.rhs(lhs, get_matches)
 
@@ -92,7 +92,7 @@ class NotNode(SearchTreeNode):
     def __init__(self, rhs: SearchTreeNode) -> None:
         self.rhs = rhs
 
-    def __call__(self, candidates: set[T], get_matches: GetMatches[T]) -> set[T]:
+    def __call__(self, candidates: AbstractSet[T], get_matches: GetMatches[T]) -> set[T]:
         return candidates.difference(self.rhs(candidates, get_matches))
 
     def iter_token_nodes(self) -> Iterator['TokenNode']:
@@ -106,7 +106,7 @@ class TokenNode(SearchTreeNode):
         self.location = location
         self.query = query
 
-    def __call__(self, candidates: set[T], get_matches: GetMatches[T]) -> set[T]:
+    def __call__(self, candidates: AbstractSet[T], get_matches: GetMatches[T]) -> set[T]:
         return get_matches(self.location, self.query, candidates)
 
     def iter_token_nodes(self) -> Iterator['TokenNode']:
