@@ -5,7 +5,7 @@ from collections.abc import Callable, Iterator, Sequence
 from enum import Enum
 from functools import lru_cache
 from gettext import gettext as _
-from typing import NamedTuple, TypeVar
+from typing import Generic, NamedTuple, TypeVar
 
 from .types import run_once
 
@@ -39,7 +39,7 @@ T = TypeVar('T')
 GetMatches = Callable[[str, str, set[T]], set[T]]
 
 
-class SearchTreeNode:
+class SearchTreeNode(Generic[T]):
     type = ExpressionType.OR
 
     def __init__(self, type: ExpressionType) -> None:

@@ -1138,7 +1138,7 @@ def build_uniforms_header(skip_generation: bool = False) -> str:
     dest = 'kitty/uniforms_generated.h'
     if skip_generation:
         return dest
-    lines = []
+    lines: List[str] = []
     a = lines.append
     uniform_names: Dict[str, Tuple[str, ...]] = {}
     class_names = {}
