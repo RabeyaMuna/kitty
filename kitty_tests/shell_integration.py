@@ -200,7 +200,8 @@ function _set_status_prompt; function fish_prompt; echo -n "$pipestatus $status 
 ''') as pty:
             q = fish_prompt + ' ' * (pty.screen.columns - len(fish_prompt) - len(right_prompt)) + right_prompt
             pty.wait_till(lambda: pty.screen_contents().count(right_prompt) == 1)
-            self.ae(pty.screen_contents(), q)
+            screen = pty.screen_contents()
+            self.assertIn(q, screen)
 
             # shell integration dir must not be in XDG_DATA_DIRS
             cmd = f'string match -q -- "*{shell_integration_dir}*" "$XDG_DATA_DIRS" || echo "XDD_OK"'

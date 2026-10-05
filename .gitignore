@@ -29,3 +29,8 @@ __pycache__/
 .cache
 bypy/b
 bypy/virtual-machines.conf
+# Shell redirection artifacts
+=[0-9]*
+>[0-9]*
+*.tmp
+*.log
