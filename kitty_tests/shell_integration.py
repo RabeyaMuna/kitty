@@ -207,7 +207,11 @@ function _set_status_prompt; function fish_prompt; echo -n "$pipestatus $status 
 ''') as pty:
             q = 'XXX\n' + fish_prompt + ' ' * (pty.screen.columns - len(fish_prompt) - len(right_prompt)) + right_prompt
             pty.wait_till(lambda: pty.screen_contents().count(right_prompt) == 1)
-            self.ae(pty.screen_contents(), q)
+
+            def filter_warnings(s):
+                return '\n'.join(line for line in s.splitlines() if not line.startswith('warning: fish could not read response to Primary Device Attribute query'))
+
+            self.ae(filter_warnings(pty.screen_contents()), q)
 
             # shell integration dir must not be in XDG_DATA_DIRS
             cmd = f'string match -q -- "*{shell_integration_dir}*" "$XDG_DATA_DIRS" || echo "XDD_OK"'
