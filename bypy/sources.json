@@ -30,10 +30,10 @@
     },
 
     {
-        "name": "openssl 3.5.2",
+        "name": "openssl 3.5.7",
         "unix": {
             "file_extension": "tar.gz",
-            "hash": "sha256:c53a47e5e441c930c3928cf7bf6fb00e5d129b630e0aa873b08258656e7345ec",
+            "hash": "sha256:a8c0d28a529ca480f9f36cf5792e2cd21984552a3c8e4aa11a24aa31aeac98e8",
             "urls": ["https://www.openssl.org/source/{filename}"]
         }
     },
@@ -59,10 +59,10 @@
     },
 
     {
-        "name": "libxml2 2.14.6",
+        "name": "libxml2 2.15.3",
         "unix": {
             "file_extension": "tar.xz",
-            "hash": "sha256:7ce458a0affeb83f0b55f1f4f9e0e55735dbfc1a9de124ee86fb4a66b597203a",
+            "hash": "sha256:78262a6e7ac170d6528ebfe2efccdf220191a5af6a6cd61ea4a9a9a5042c7a07",
             "urls": ["https://download.gnome.org/sources/libxml2/{version_except_last}/{filename}"]
         }
     },
@@ -78,11 +78,11 @@
     },
 
     {
-        "name": "sqlite 3.50.4",
+        "name": "sqlite 3.53.2",
         "unix": {
             "file_extension": "tar.gz",
-            "hash": "sha256:a3db587a1b92ee5ddac2f66b3edb41b26f9c867275782d46c3a088977d6a5b18",
-            "urls": ["https://www.sqlite.org/2025/{name}-autoconf-3500400.{file_extension}"]
+            "hash": "sha256:588ad51949419a56ebe81fe56193d510c559eb94c9a57748387860b5d3069316",
+            "urls": ["https://www.sqlite.org/2026/{name}-autoconf-3530200.{file_extension}"]
         }
     },
 
@@ -145,19 +145,19 @@
     },
 
     {
-        "name": "python 3.12.11",
+        "name": "python 3.14.7",
         "unix": {
             "file_extension": "tar.xz",
-            "hash": "md5:9613d56b90d0d0cfd19980c7e2956a06",
+            "hash": "sha256:3b48dac8fb59f62eaa67ac83c1eb12bda1b7a08406dd286e252c11a66be27f81",
             "urls": ["https://www.python.org/ftp/python/{version}/Python-{version}.{file_extension}"]
         }
     },
 
     {
-        "name": "libpng 1.6.43",
+        "name": "libpng 1.6.57",
         "unix": {
             "file_extension": "tar.xz",
-            "hash": "sha256:6a5ca0652392a2d7c9db2ae5b40210843c0bbc081cbd410825ab00cc59f14a6c",
+            "hash": "sha256:d10c20d7171569804cae8dfc13ba6dcd0662c41ed39d43d4d429314aafb10a80",
             "urls": ["https://downloads.sourceforge.net/sourceforge/libpng/{filename}"]
         }
     },
@@ -202,12 +202,12 @@
     },
 
     {
-        "name": "glib 2.82.5",
+        "name": "glib 2.88.1",
         "os": "linux",
         "unix": {
             "file_extension": "tar.xz",
-            "hash": "sha256:05c2031f9bdf6b5aba7a06ca84f0b4aced28b19bf1b50c6ab25cc675277cbc3f",
-            "urls": ["https://download.gnome.org/sources/glib/{version_except_last}/{filename}"]
+            "hash": "sha256:51ab804c56f6eab3e5045c774d1290ac5e4c923d4f9a3d8e33123bee45c1840e",
+            "urls": ["https://ftp.gnome.org/pub/GNOME/sources/glib/{version_except_last}/{filename}"]
         }
     },
 
