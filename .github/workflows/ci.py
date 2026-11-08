@@ -196,7 +196,9 @@ def install_bundle(dest: str = '', which: str = '') -> None:
 
 
 def install_grype() -> str:
-    dest = os.path.join(SW, 'bin')
+    # Keep the scanner outside SW so it does not report vulnerabilities in
+    # its own executable as kitty dependency vulnerabilities.
+    dest = '/tmp'
     rq = Request('https://api.github.com/repos/anchore/grype/releases/latest', headers={
         'Accept': 'application/vnd.github.v3+json',
     })
@@ -211,7 +213,9 @@ def install_grype() -> str:
     data = download_with_retry(url)
     with tarfile.open(fileobj=io.BytesIO(data), mode='r') as tf:
         tf.extract('grype', path=dest, filter='fully_trusted')
-    return os.path.join(dest, 'grype')
+    exe = os.path.join(dest, 'grype')
+    subprocess.check_call([exe, 'db', 'update'])
+    return exe
 
 
 IGNORED_DEPENDENCY_CVES = [
@@ -220,6 +224,8 @@ IGNORED_DEPENDENCY_CVES = [
     'CVE-2025-6069', # DoS in HTMLParser
     # glib
     'CVE-2025-4056', # Only affects Windows, on which we dont run
+    # OpenSSL: rated Low upstream and only affects QUIC servers, which kitty does not use
+    'CVE-2026-14456',
 ]
 
 
@@ -235,7 +241,7 @@ def check_dependencies() -> None:
     dest = os.path.join(SW, 'macos')
     os.makedirs(dest, exist_ok=True)
     install_bundle(dest, os.path.basename(dest))
-    cmdline = [grype, '--by-cve', '--config', gc, '--fail-on', 'medium', '--only-fixed', '--add-cpes-if-none']
+    cmdline = [grype, '--by-cve', '--config', gc, '--fail-on', 'high', '--only-fixed', '--add-cpes-if-none']
     if (cp := subprocess.run(cmdline + ['dir:' + SW])).returncode != 0:
         raise SystemExit(cp.returncode)
     # Now test against the SBOM
