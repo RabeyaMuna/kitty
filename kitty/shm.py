@@ -11,6 +11,7 @@ import os
 import secrets
 import stat
 import struct
+from typing import Literal
 
 from kitty.fast_data_types import SHM_NAME_MAX, shm_open, shm_unlink
 
@@ -105,7 +106,7 @@ class SharedMemory:
     def tell(self) -> int:
         return self.mmap.tell()
 
-    def seek(self, pos: int, whence: int = os.SEEK_SET) -> None:
+    def seek(self, pos: int, whence: Literal[0, 1, 2] = os.SEEK_SET) -> None:
         self.mmap.seek(pos, whence)
 
     def flush(self) -> None:

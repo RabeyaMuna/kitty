@@ -5,7 +5,7 @@ from collections.abc import Callable, Iterator, Sequence
 from enum import Enum
 from functools import lru_cache
 from gettext import gettext as _
-from typing import NamedTuple, TypeVar
+from typing import Any, Generic, NamedTuple, TypeVar
 
 from .types import run_once
 
@@ -39,7 +39,7 @@ T = TypeVar('T')
 GetMatches = Callable[[str, str, set[T]], set[T]]
 
 
-class SearchTreeNode:
+class SearchTreeNode(Generic[T]):
     type = ExpressionType.OR
 
     def __init__(self, type: ExpressionType) -> None:
@@ -51,13 +51,13 @@ class SearchTreeNode:
     def __call__(self, candidates: set[T], get_matches: GetMatches[T]) -> set[T]:
         return set()
 
-    def iter_token_nodes(self) -> Iterator['TokenNode']:
+    def iter_token_nodes(self) -> Iterator['TokenNode[T]']:
         return iter(())
 
 
-class OrNode(SearchTreeNode):
+class OrNode(SearchTreeNode[T]):
 
-    def __init__(self, lhs: SearchTreeNode, rhs: SearchTreeNode) -> None:
+    def __init__(self, lhs: SearchTreeNode[T], rhs: SearchTreeNode[T]) -> None:
         self.lhs = lhs
         self.rhs = rhs
 
@@ -65,15 +65,15 @@ class OrNode(SearchTreeNode):
         lhs = self.lhs(candidates, get_matches)
         return lhs.union(self.rhs(candidates.difference(lhs), get_matches))
 
-    def iter_token_nodes(self) -> Iterator['TokenNode']:
+    def iter_token_nodes(self) -> Iterator['TokenNode[T]']:
         yield from self.lhs.iter_token_nodes()
         yield from self.rhs.iter_token_nodes()
 
 
-class AndNode(SearchTreeNode):
+class AndNode(SearchTreeNode[T]):
     type = ExpressionType.AND
 
-    def __init__(self, lhs: SearchTreeNode, rhs: SearchTreeNode) -> None:
+    def __init__(self, lhs: SearchTreeNode[T], rhs: SearchTreeNode[T]) -> None:
         self.lhs = lhs
         self.rhs = rhs
 
@@ -81,25 +81,25 @@ class AndNode(SearchTreeNode):
         lhs = self.lhs(candidates, get_matches)
         return self.rhs(lhs, get_matches)
 
-    def iter_token_nodes(self) -> Iterator['TokenNode']:
+    def iter_token_nodes(self) -> Iterator['TokenNode[T]']:
         yield from self.lhs.iter_token_nodes()
         yield from self.rhs.iter_token_nodes()
 
 
-class NotNode(SearchTreeNode):
+class NotNode(SearchTreeNode[T]):
     type = ExpressionType.NOT
 
-    def __init__(self, rhs: SearchTreeNode) -> None:
+    def __init__(self, rhs: SearchTreeNode[T]) -> None:
         self.rhs = rhs
 
     def __call__(self, candidates: set[T], get_matches: GetMatches[T]) -> set[T]:
         return candidates.difference(self.rhs(candidates, get_matches))
 
-    def iter_token_nodes(self) -> Iterator['TokenNode']:
+    def iter_token_nodes(self) -> Iterator['TokenNode[T]']:
         yield from self.rhs.iter_token_nodes()
 
 
-class TokenNode(SearchTreeNode):
+class TokenNode(SearchTreeNode[T]):
     type = ExpressionType.TOKEN
 
     def __init__(self, location: str, query: str) -> None:
@@ -109,7 +109,7 @@ class TokenNode(SearchTreeNode):
     def __call__(self, candidates: set[T], get_matches: GetMatches[T]) -> set[T]:
         return get_matches(self.location, self.query, candidates)
 
-    def iter_token_nodes(self) -> Iterator['TokenNode']:
+    def iter_token_nodes(self) -> Iterator['TokenNode[T]']:
         yield self
 
 
@@ -197,7 +197,7 @@ class Parser:
             for tt, tv in tokens
         ]
 
-    def parse(self, expr: str, locations: Sequence[str]) -> SearchTreeNode:
+    def parse(self, expr: str, locations: Sequence[str]) -> SearchTreeNode[Any]:
         self.locations = locations
         self.tokens = self.tokenize(expr)
         self.current_token = 0
@@ -206,14 +206,14 @@ class Parser:
             raise ParseException(_('Extra characters at end of search'))
         return prog
 
-    def or_expression(self) -> SearchTreeNode:
+    def or_expression(self) -> SearchTreeNode[Any]:
         lhs = self.and_expression()
         if self.lcase_token() == 'or':
             self.advance()
             return OrNode(lhs, self.or_expression())
         return lhs
 
-    def and_expression(self) -> SearchTreeNode:
+    def and_expression(self) -> SearchTreeNode[Any]:
         lhs = self.not_expression()
         if self.lcase_token() == 'and':
             self.advance()
@@ -224,13 +224,13 @@ class Parser:
             return AndNode(lhs, self.and_expression())
         return lhs
 
-    def not_expression(self) -> SearchTreeNode:
+    def not_expression(self) -> SearchTreeNode[Any]:
         if self.lcase_token() == 'not':
             self.advance()
             return NotNode(self.not_expression())
         return self.location_expression()
 
-    def location_expression(self) -> SearchTreeNode:
+    def location_expression(self) -> SearchTreeNode[Any]:
         if self.token_type() == TokenType.OPCODE and self.token() == '(':
             self.advance()
             res = self.or_expression()
@@ -242,7 +242,7 @@ class Parser:
 
         return self.base_token()
 
-    def base_token(self) -> SearchTreeNode:
+    def base_token(self) -> SearchTreeNode[Any]:
         if self.token_type() is TokenType.QUOTED_WORD:
             tt = self.token(advance=True)
             assert tt is not None
@@ -280,7 +280,7 @@ class Parser:
 
 
 @lru_cache(maxsize=64)
-def build_tree(query: str, locations: str | tuple[str, ...], allow_no_location: bool = False) -> SearchTreeNode:
+def build_tree(query: str, locations: str | tuple[str, ...], allow_no_location: bool = False) -> SearchTreeNode[Any]:
     if isinstance(locations, str):
         locations = tuple(locations.split())
     p = Parser(allow_no_location)
