@@ -207,8 +207,10 @@ read_features_from_font_table(const uint8_t *table, size_t table_len, PyObject *
 bool
 read_STAT_font_table(const uint8_t *table, size_t table_len, PyObject *name_lookup_table, PyObject *output) {
     uint16_t elided_fallback_name_id = 0;
-    RAII_PyObject(design_axes, PyTuple_New(0));
-    RAII_PyObject(multi_axis_styles, PyTuple_New(0));
+    RAII_PyObject(design_axes, PyList_New(0));
+    RAII_PyObject(design_axes_tuple, NULL);
+    RAII_PyObject(multi_axis_styles, PyList_New(0));
+    RAII_PyObject(multi_axis_styles_tuple, NULL);
     if (!design_axes || !multi_axis_styles) return false;
     if (table_len < 20) goto ok;
     const uint16_t *p = (uint16_t*)table;
@@ -224,7 +226,6 @@ read_STAT_font_table(const uint8_t *table, size_t table_len, PyObject *name_look
     if (major_version == 1 && minor_version < 1) elided_fallback_name_id = 0;
     const uint8_t *table_limit = table + table_len;
     size_t count = 0;
-    if (_PyTuple_Resize(&design_axes, count_of_design_axis_entries) == -1) return false;
     for (
         const uint8_t *pos = table + offset_to_start_of_design_axes_entries;
         pos + size_of_design_axis_entry <= table_limit && count < count_of_design_axis_entries;
@@ -232,15 +233,12 @@ read_STAT_font_table(const uint8_t *table, size_t table_len, PyObject *name_look
     ) {
         p = (uint16_t*)(pos + 4);
         uint16_t name_id = next, ordering = next;
-        PyObject *rec = Py_BuildValue("{ss# sN sH sN}", "tag", (char*)pos, 4, "name", get_best_name(name_lookup_table, name_id), "ordering", ordering, "values", PyList_New(0));
+        RAII_PyObject(rec, Py_BuildValue("{ss# sN sH sN}", "tag", (char*)pos, 4, "name", get_best_name(name_lookup_table, name_id), "ordering", ordering, "values", PyList_New(0)));
         if (!rec) return false;
-        PyTuple_SET_ITEM(design_axes, count, rec);
+        if (PyList_Append(design_axes, rec) != 0) return false;
     }
-    if (_PyTuple_Resize(&design_axes, count) == -1) return false;
     count = 0;
     const uint8_t *start_of_axis_values_offsets_array = table + offset_to_start_of_axis_value_entries;
-    Py_ssize_t i = 0;
-    if (_PyTuple_Resize(&multi_axis_styles, count_of_axis_value_entries) == -1) return false;
     for (
         const uint8_t *pos = start_of_axis_values_offsets_array;
         pos + 2 <= table_limit && count < count_of_axis_value_entries;
@@ -257,42 +255,48 @@ read_STAT_font_table(const uint8_t *table, size_t table_len, PyObject *name_look
     RAII_PyObject(v, Py_BuildValue("{sH sH sN " fmt "}", \
                 "format", format, "flags", flags, "name", get_best_name(name_lookup_table, value_name_id), __VA_ARGS__)); \
     if (!v) return false; \
-    PyObject *l = PyDict_GetItemString(PyTuple_GET_ITEM(design_axes, axis_index), "values"); \
+    PyObject *l = PyDict_GetItemString(PyList_GET_ITEM(design_axes, axis_index), "values"); \
     if (l && PyList_Append(l, v) != 0) return false;  \
 }
         switch(format) {
-            case 1: if (p32 + 1 <= (uint32_t*)table_limit && axis_index < PyTuple_GET_SIZE(design_axes)) {
+            case 1: if (p32 + 1 <= (uint32_t*)table_limit && axis_index < PyList_GET_SIZE(design_axes)) {
                 const double value = next32; app("sd", "value", value);
             } break;
-            case 2: if (p32 + 3 <= (uint32_t*)table_limit && axis_index < PyTuple_GET_SIZE(design_axes)) {
+            case 2: if (p32 + 3 <= (uint32_t*)table_limit && axis_index < PyList_GET_SIZE(design_axes)) {
                 const double value = next32, minimum = next32, maximum = next32;
                 app("sd sd sd", "value", value, "minimum", minimum, "maximum", maximum);
             } break;
-            case 3: if (p32 + 2 <= (uint32_t*)table_limit && axis_index < PyTuple_GET_SIZE(design_axes)) {
+            case 3: if (p32 + 2 <= (uint32_t*)table_limit && axis_index < PyList_GET_SIZE(design_axes)) {
                 const double value = next32, linked_value = next32;
                 app("sd sd", "value", value, "linked_value", linked_value);
             } break;
-            case 4: if ((uint8_t*)(p) + 6 * axis_index <= table_limit) {
-                RAII_PyObject(values, PyTuple_New(axis_index));
+            case 4: if (axis_index <= (size_t)(table_limit - (uint8_t*)p) / 6) {
+                RAII_PyObject(values, PyList_New(0));
+                RAII_PyObject(values_tuple, NULL);
                 if (!values) return false;
                 for (uint16_t n = 0; n < axis_index; n++, p += 3) {
                     uint16_t actual_axis_index = next;
                     p32 = (uint32_t*)p; double value = next32;
-                    PyObject *e = Py_BuildValue("{sH sd}", "design_index", actual_axis_index, "value", value);
+                    RAII_PyObject(e, Py_BuildValue("{sH sd}", "design_index", actual_axis_index, "value", value));
                     if (!e) return false;
-                    PyTuple_SET_ITEM(values, n, e);
+                    if (PyList_Append(values, e) != 0) return false;
                 }
-                PyObject *e = Py_BuildValue("{sH sN sO}", "flags", flags,
-                        "name", get_best_name(name_lookup_table, value_name_id), "values", values);
+                values_tuple = PyList_AsTuple(values);
+                if (!values_tuple) return false;
+                RAII_PyObject(e, Py_BuildValue("{sH sN sO}", "flags", flags,
+                        "name", get_best_name(name_lookup_table, value_name_id), "values", values_tuple));
                 if (!e) return false;
-                PyTuple_SET_ITEM(multi_axis_styles, i++, e);
+                if (PyList_Append(multi_axis_styles, e) != 0) return false;
             } break;
         }
     }
-    if (_PyTuple_Resize(&multi_axis_styles, i) == -1) return false;
 ok:
-    if (PyDict_SetItemString(output, "design_axes", design_axes) != 0) return false;
-    if (PyDict_SetItemString(output, "multi_axis_styles", multi_axis_styles) != 0) return false;
+    design_axes_tuple = PyList_AsTuple(design_axes);
+    if (!design_axes_tuple) return false;
+    multi_axis_styles_tuple = PyList_AsTuple(multi_axis_styles);
+    if (!multi_axis_styles_tuple) return false;
+    if (PyDict_SetItemString(output, "design_axes", design_axes_tuple) != 0) return false;
+    if (PyDict_SetItemString(output, "multi_axis_styles", multi_axis_styles_tuple) != 0) return false;
     if (PyDict_SetItemString(output, "elided_fallback_name", elided_fallback_name_id ? get_best_name(name_lookup_table, elided_fallback_name_id) : PyUnicode_FromString("")) != 0) return false;
     return true;
 }
@@ -308,11 +312,16 @@ read_fvar_font_table(const uint8_t *table, size_t table_len, PyObject *name_look
     p += 2;
     const uint16_t offset_to_start_of_axis_array = next; next;
     const uint16_t num_of_axis_records = next, size_of_axis_record = next, num_of_name_records = next, size_of_name_record = next;
-    const uint16_t size_of_coordinates = num_of_axis_records * sizeof(int32_t);
+    const uint32_t size_of_coordinates = (uint32_t)num_of_axis_records * sizeof(int32_t);
     if (size_of_name_record < size_of_coordinates + 4) {
         PyErr_Format(PyExc_ValueError, "size of name record: %u too small", size_of_name_record); return NULL;
     }
     const bool has_postscript_name = size_of_name_record >= 3 * sizeof(uint16_t) + size_of_coordinates;
+    // Comprehensive bounds check: ensure axis array fits within table
+    if (offset_to_start_of_axis_array > table_len ||
+        (uint32_t)num_of_axis_records * size_of_axis_record > table_len - offset_to_start_of_axis_array) {
+        goto ok;
+    }
     uint16_t i = 0;
     if (size_of_axis_record < 20) { PyErr_Format(PyExc_ValueError, "size of axis record: %u too small", size_of_axis_record); return NULL; }
     if (_PyTuple_Resize(&axes, num_of_axis_records) == -1) return NULL;
@@ -336,7 +345,7 @@ read_fvar_font_table(const uint8_t *table, size_t table_len, PyObject *name_look
     i = 0;
     if (_PyTuple_Resize(&named_styles, num_of_name_records) == -1) return NULL;
     for (
-        const uint8_t *pos = table + offset_to_start_of_axis_array + num_of_axis_records * size_of_axis_record;
+        const uint8_t *pos = table + offset_to_start_of_axis_array + (uint32_t)num_of_axis_records * size_of_axis_record;
         pos + size_of_name_record <= table + table_len && i < num_of_name_records;
         i++, pos += size_of_name_record
     ) {
@@ -346,7 +355,7 @@ read_fvar_font_table(const uint8_t *table, size_t table_len, PyObject *name_look
         RAII_PyObject(axis_values, PyDict_New());
         if (!axis_values) return NULL;
         for (uint16_t i = 0; i < num_of_axis_records; i++) {
-            const uint8_t *t = table + offset_to_start_of_axis_array + i * size_of_axis_record;
+            const uint8_t *t = table + offset_to_start_of_axis_array + (uint32_t)i * size_of_axis_record;
             memcpy(tag_buf, t, 4);
             RAII_PyObject(pval, PyFloat_FromDouble(next32));
             if (!pval || PyDict_SetItemString(axis_values, tag_buf, pval) != 0) return NULL;

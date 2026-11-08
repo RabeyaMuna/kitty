@@ -210,10 +210,12 @@ documentation for them.
     title behaves just as for a regular tab in kitty.
 
 ``os_window_class``
-    Set the :option:`class part of WM_CLASS or Wayland Application Id <kitty --class>` for the current OS Window
+    Set the class part of ``WM_CLASS`` or Wayland application ID (equivalent to
+    :code:`kitty --class`) for the current OS Window.
 
 ``os_window_name``
-    Set the :option:`name part of WM_CLASS or Wayland Window tag <kitty --name>` for the current OS Window
+    Set the name part of ``WM_CLASS`` or Wayland window tag (equivalent to
+    :code:`kitty --name`) for the current OS Window.
 
 ``os_window_size``
     Set the size of the current OS Window, can be specified in pixels or cells.
@@ -234,5 +236,4 @@ documentation for them.
 ``title``
     Set the title for the next window. Deprecated, use ``launch --title``
     instead.
-
 
