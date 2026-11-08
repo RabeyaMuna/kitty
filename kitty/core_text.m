@@ -285,7 +285,7 @@ coretext_all_fonts(PyObject UNUSED *_self, PyObject *monospaced_only_) {
         }
         temp = font_descriptor_to_python(desc);
         if (temp == NULL) return NULL;
-        PyTuple_SET_ITEM(ans, num++, temp); temp = NULL;
+        PyTuple_SET_ITEM(ans, num, temp); num++; temp = NULL;
     }
     if (_PyTuple_Resize(&ans, num) == -1) return NULL;
     Py_INCREF(ans);

@@ -138,7 +138,11 @@ class Callbacks:
         self.bell_count += 1
 
     def on_da1(self) -> None:
-        self.da1.append(da1(get_options()))
+        response = da1(get_options())
+        self.da1.append(response)
+        if self.pty:
+            # Don't flush immediately to avoid reentrant parse_bytes() call
+            self.pty.write_to_child('[' + response, flush=False)
 
     def on_activity_since_last_focus(self) -> None:
         pass
